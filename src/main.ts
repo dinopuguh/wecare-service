@@ -7,6 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
+  app.setGlobalPrefix('api');
 
   const options = new DocumentBuilder()
     .setTitle('WeCare Webservice')
@@ -15,6 +16,7 @@ import { ValidationPipe } from '@nestjs/common';
     .addTag('auth')
     .addTag('user')
     .addBearerAuth()
+    .setBasePath('api')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
