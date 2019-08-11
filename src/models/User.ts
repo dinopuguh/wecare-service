@@ -1,46 +1,58 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BeforeInsert,
+  Unique,
+} from 'typeorm';
+import * as crypto from 'crypto';
+import { ApiModelProperty } from '@nestjs/swagger';
 
 @Entity()
+@Unique(['username', 'email'])
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
 
   @Column()
+  username: string;
+
+  @Column({ nullable: true })
   phone: string;
 
   @Column()
   email: string;
 
-  @Column()
+  @Column({ nullable: true, select: false })
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
   photo: string;
 
-  @Column()
+  @Column({ nullable: true })
   gender: string;
 
-  @Column('int')
+  @Column('int', { nullable: true })
   age: number;
 
-  @Column()
+  @Column({ nullable: true })
   profession: string;
 
-  @Column()
+  @Column({ nullable: true })
   domicile: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   description: string;
 
-  @Column('int')
+  @Column('int', { nullable: true, default: 0 })
   wecare_point: number;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   expertises: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   relevance_issues: string;
 }
