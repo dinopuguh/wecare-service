@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../../models/User';
-import { ApiUseTags, ApiImplicitParam } from '@nestjs/swagger';
+import { ApiUseTags, ApiImplicitParam, ApiOperation } from '@nestjs/swagger';
 
 @ApiUseTags('user')
 @Controller('user')
