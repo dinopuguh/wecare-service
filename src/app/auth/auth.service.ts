@@ -1,8 +1,13 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { sign } from 'jsonwebtoken';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create.dto';
-import * as bcrypt from 'bcrypt';
+import { compareSync } from 'bcrypt';
+import { User } from '../../models/User';
 
 export enum Provider {
   GOOGLE = 'google',
@@ -33,26 +38,40 @@ export class AuthService {
     }
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.userService.findByUsername(username);
-    if (user && bcrypt.compare(user.password, password)) {
-      const { password, ...result } = user;
-      return result;
+  async validateUser(phone: string, password: string): Promise<any> {
+    try {
+      const user = await this.userService.findByPhone(phone);
+      if (user && (await compareSync(password, user.password))) {
+        const { password, ...result } = user;
+        return result;
+      }
+      return null;
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
-    return null;
   }
 
   async login(user: any): Promise<any | { status: number }> {
-    const payload = { username: user.username, sub: user.id };
-    const userData = await this.userService.findByUsername(user.username);
-    return {
-      statusCode: 200,
-      data: userData,
-      accessToken: sign(payload, this.JWT_SECRET_KEY),
-    };
+    try {
+      const payload = { phone: user.phone, sub: user.id };
+      const { password, ...userData } = await this.userService.findByPhone(
+        user.phone,
+      );
+      return {
+        statusCode: 200,
+        data: userData,
+        accessToken: sign(payload, this.JWT_SECRET_KEY),
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  async register(createUserDto: CreateUserDto): Promise<any> {
-    return await this.userService.create(createUserDto);
+  async register(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      return await this.userService.create(createUserDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

@@ -12,9 +12,11 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create.dto';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthLoginDto } from './dto/login.dto';
+import { CurrentUser } from '../../custom.decorator';
+import { User } from '../../models/User';
+import { IService } from 'src/interfaces/IService';
 
 @ApiUseTags('auth')
-@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -31,20 +33,28 @@ export class AuthController {
     else res.json({ token: null });
   }
 
-  @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Body() authLoginDto: AuthLoginDto): Promise<any> {
+  @UseGuards(AuthGuard('local'))
+  login(@Body() authLoginDto: AuthLoginDto): Promise<any> {
     return this.authService.login(authLoginDto);
   }
 
   @Post('register')
-  async register(@Body() createUserDto: CreateUserDto): Promise<any> {
+  register(@Body() createUserDto: CreateUserDto): Promise<any> {
     return this.authService.register(createUserDto);
   }
 
   @Get('protected')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   protectedResource() {
     return 'JWT is working!';
+  }
+
+  @Get('current')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  CurrentUser(@CurrentUser() user: User) {
+    return user;
   }
 }

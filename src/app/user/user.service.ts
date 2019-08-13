@@ -2,19 +2,22 @@ import { Injectable, BadRequestException, HttpException } from '@nestjs/common';
 import { User } from '../../models/User';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { hashSync } from 'bcrypt';
 import { CreateUserDto } from './dto/create.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async findAll(): Promise<User[]> {
     try {
-      return await this.userRepository.find();
+      const data = await this.userRepository.find();
+      const dataUser = data.map(({ password, ...item }) => item);
+
+      return dataUser;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -22,29 +25,32 @@ export class UserService {
 
   async findById(id: string): Promise<User | undefined> {
     try {
-      return await this.userRepository.findOne(id);
+      const { password, ...data } = await this.userRepository.findOne(id);
+      return data;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async findByUsername(username: string): Promise<User | undefined> {
+  async findByPhone(phone: string): Promise<User | undefined> {
     try {
-      return await this.userRepository.findOne({ where: { username } });
+      return await this.userRepository.findOne({
+        where: { phone },
+      });
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(user: CreateUserDto): Promise<User> {
     try {
-      createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
-      if (!(await this.validEmail(createUserDto.email)))
+      user.password = await hashSync(user.password, 10);
+      if (!(await this.validEmail(user.email)))
         throw new BadRequestException('Email must unique', 'email');
-      if (!(await this.validUsername(createUserDto.username)))
-        throw new BadRequestException('Username must unique', 'username');
+      if (!(await this.validPhone(user.phone)))
+        throw new BadRequestException('Phone number must unique', 'phone');
 
-      return await this.userRepository.save(createUserDto);
+      return await this.userRepository.save(user);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -59,10 +65,9 @@ export class UserService {
     }
   }
 
-  async validUsername(username: string): Promise<boolean> {
+  async validPhone(phone: string): Promise<boolean> {
     try {
-      if (await this.userRepository.findOne({ where: { username } }))
-        return false;
+      if (await this.userRepository.findOne({ where: { phone } })) return false;
       return true;
     } catch (error) {
       throw new BadRequestException(error.message);

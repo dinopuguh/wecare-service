@@ -5,9 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { AuthModule } from './app/auth/auth.module';
 import { UserModule } from './app/user/user.module';
+import { ActivityModule } from './app/activity/activity.module';
+import { CategoryModule } from './app/category/category.module';
+import { TypeModule } from './app/type/type.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), AuthModule, UserModule],
+  imports: [TypeOrmModule.forRoot(), AuthModule, UserModule, ActivityModule, CategoryModule, TypeModule],
   controllers: [AppController],
   providers: [AppService],
 })

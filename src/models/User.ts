@@ -2,14 +2,13 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  BeforeInsert,
   Unique,
+  OneToMany,
 } from 'typeorm';
-import * as crypto from 'crypto';
-import { ApiModelProperty } from '@nestjs/swagger';
+import { Activity } from './Activity';
 
 @Entity()
-@Unique(['username', 'email'])
+@Unique(['phone', 'email'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -18,19 +17,16 @@ export class User {
   name: string;
 
   @Column()
-  username: string;
-
-  @Column({ nullable: true })
   phone: string;
 
   @Column()
   email: string;
 
-  @Column({ nullable: true, select: false })
-  password: string;
+  @Column({ nullable: true })
+  password?: string;
 
   @Column({ nullable: true })
-  photo: string;
+  photo?: string;
 
   @Column({ nullable: true })
   gender: string;
@@ -39,20 +35,23 @@ export class User {
   age: number;
 
   @Column({ nullable: true })
-  profession: string;
+  profession?: string;
 
   @Column({ nullable: true })
-  domicile: string;
+  domicile?: string;
 
   @Column('text', { nullable: true })
-  description: string;
+  description?: string;
 
   @Column('int', { nullable: true, default: 0 })
   wecare_point: number;
 
   @Column('text', { nullable: true })
-  expertises: string;
+  expertises?: string;
 
   @Column('text', { nullable: true })
-  relevance_issues: string;
+  relevance_issues?: string;
+
+  @OneToMany(type => Activity, activity => activity.campaigner)
+  activities: Activity[];
 }

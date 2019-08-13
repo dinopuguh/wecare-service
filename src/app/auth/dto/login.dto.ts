@@ -1,13 +1,13 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty, Length, IsPhoneNumber } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
 export class AuthLoginDto {
   @IsNotEmpty()
+  // @IsPhoneNumber('ID')
   @ApiModelProperty()
-  username: string;
+  phone: string;
 
   @IsNotEmpty()
-  @Length(8)
   @ApiModelProperty()
   password: string;
 }
