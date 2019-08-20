@@ -4,28 +4,30 @@ import { Category } from '../../models/Category';
 import { ApiUseTags, ApiImplicitParam, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateCategoryDto } from './dto/create.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { IService } from 'src/interfaces/IService';
+import { Crud } from '@nestjsx/crud';
 
+@Crud({
+  model: {
+    type: CreateCategoryDto,
+  },
+  routes: {
+    exclude: ['createManyBase'],
+    createOneBase: {
+      decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
+    },
+    deleteOneBase: {
+      decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
+    },
+    updateOneBase: {
+      decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
+    },
+    replaceOneBase: {
+      decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
+    },
+  },
+})
 @ApiUseTags('category')
 @Controller('category')
-export class CategoryController implements IService {
-  constructor(private readonly categoryService: CategoryService) {}
-
-  @Get()
-  findAll(): Promise<Category[]> {
-    return this.categoryService.findAll();
-  }
-
-  @Get(':id')
-  @ApiImplicitParam({ name: 'id', type: 'string' })
-  findById(@Param() id: string): Promise<Category> {
-    return this.categoryService.findById(id);
-  }
-
-  @Post()
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  create(@Body() category: CreateCategoryDto): Promise<Category> {
-    return this.categoryService.create(category);
-  }
+export class CategoryController {
+  constructor(private readonly service: CategoryService) {}
 }

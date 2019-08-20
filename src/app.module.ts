@@ -7,10 +7,21 @@ import { AuthModule } from './app/auth/auth.module';
 import { UserModule } from './app/user/user.module';
 import { ActivityModule } from './app/activity/activity.module';
 import { CategoryModule } from './app/category/category.module';
+import { LocationModule } from './app/location/location.module';
+import { ConfigModule } from './app/config/config.module';
 import { TypeModule } from './app/type/type.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), AuthModule, UserModule, ActivityModule, CategoryModule, TypeModule],
+  imports: [
+    TypeOrmModule.forRoot(),
+    AuthModule,
+    UserModule,
+    ActivityModule,
+    CategoryModule,
+    LocationModule,
+    ConfigModule,
+    TypeModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

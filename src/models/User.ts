@@ -4,14 +4,18 @@ import {
   PrimaryGeneratedColumn,
   Unique,
   OneToMany,
+  ManyToMany,
+  JoinTable,
+  RelationId,
 } from 'typeorm';
 import { Activity } from './Activity';
+import { Location } from './Location';
 
 @Entity()
 @Unique(['phone', 'email'])
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   name: string;
@@ -44,14 +48,24 @@ export class User {
   description?: string;
 
   @Column('int', { nullable: true, default: 0 })
-  wecare_point: number;
+  wecarePoint: number;
 
   @Column('text', { nullable: true })
   expertises?: string;
 
   @Column('text', { nullable: true })
-  relevance_issues?: string;
+  relevanceIssues?: string;
 
   @OneToMany(type => Activity, activity => activity.campaigner)
   activities: Activity[];
+
+  @OneToMany(type => Location, location => location.user)
+  locations: Location[];
+
+  @RelationId((user: User) => user.bookmarks)
+  bookmarkIds: number[];
+
+  @ManyToMany(type => Activity)
+  @JoinTable()
+  bookmarks: Activity[];
 }

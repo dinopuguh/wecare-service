@@ -4,8 +4,9 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { sign } from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-import { CreateUserDto } from '../user/dto/create.dto';
+import { CreateUserDto } from '../user/dto/create';
 import { compareSync } from 'bcrypt';
 import { User } from '../../models/User';
 
@@ -17,7 +18,10 @@ export enum Provider {
 export class AuthService {
   private readonly JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async validateOAuthLogin(
     thirdPartyId: string,
@@ -53,14 +57,17 @@ export class AuthService {
 
   async login(user: any): Promise<any | { status: number }> {
     try {
-      const payload = { phone: user.phone, sub: user.id };
       const { password, ...userData } = await this.userService.findByPhone(
         user.phone,
       );
+      const payload = {
+        id: userData.id,
+        phone: userData.phone,
+        email: userData.email,
+      };
       return {
         statusCode: 200,
-        data: userData,
-        accessToken: sign(payload, this.JWT_SECRET_KEY),
+        data: { user: userData, accessToken: this.jwtService.sign(payload) },
       };
     } catch (error) {
       throw new BadRequestException(error.message);

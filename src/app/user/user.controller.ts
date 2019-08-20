@@ -1,21 +1,40 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../../models/User';
-import { ApiUseTags, ApiImplicitParam, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiUseTags,
+  ApiImplicitParam,
+  ApiOperation,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { Crud } from '@nestjsx/crud';
+import { CurrentUser } from '../../custom.decorator';
+import { AuthGuard } from '@nestjs/passport';
 
+@Crud({
+  model: {
+    type: User,
+  },
+  routes: {
+    only: ['getManyBase', 'getOneBase'],
+  },
+  query: {
+    exclude: ['password'],
+    join: {
+      bookmarks: {},
+    },
+  },
+})
 @ApiUseTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly service: UserService) {}
 
-  @Get()
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  @ApiImplicitParam({ name: 'id', type: 'string' })
-  findById(@Param() id: string): Promise<User> {
-    return this.userService.findById(id);
+  @Patch('bookmark-activity/:id')
+  @ApiBearerAuth()
+  @ApiImplicitParam({ name: 'id', type: 'number' })
+  @UseGuards(AuthGuard('jwt'))
+  findById(@Param() id: number, @CurrentUser() user: User): Promise<User> {
+    return this.service.bookmarkActivity(id, user);
   }
 }

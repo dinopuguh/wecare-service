@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsDate, IsDateString } from 'class-validator';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { Category } from 'src/models/Category';
 
@@ -21,7 +21,7 @@ export class CreateActivityDto {
 
   @IsNotEmpty()
   @ApiModelProperty()
-  register_deadline: string;
+  registerDeadline: string;
 
   @IsNotEmpty()
   @ApiModelProperty()
@@ -29,31 +29,31 @@ export class CreateActivityDto {
 
   @IsNotEmpty()
   @ApiModelProperty()
-  volunteer_tasks: string;
+  volunteerTasks: string;
 
   @IsNotEmpty()
   @ApiModelProperty()
-  volunteer_equipments: string;
+  volunteerEquipments: string;
 
   @IsNotEmpty()
   @ApiModelProperty()
-  volunteer_requirements: string;
+  volunteerRequirements: string;
 
   @IsNotEmpty()
   @ApiModelProperty()
   briefs: string;
 
   @ApiModelPropertyOptional()
-  min_volunteers: number;
+  minVolunteers: number;
 
   @ApiModelPropertyOptional()
-  donation_target: number;
+  donationTarget: number;
 
   @ApiModelPropertyOptional()
-  volunteers_total: number;
+  volunteersTotal: number;
 
   @ApiModelPropertyOptional()
-  donations_total: number;
+  donationsTotal: number;
 
   @IsNotEmpty()
   @ApiModelProperty()
@@ -61,13 +61,13 @@ export class CreateActivityDto {
 
   @IsNotEmpty()
   @ApiModelProperty()
-  max_participants: number;
+  maxParticipants: number;
 
   @IsNotEmpty()
   @ApiModelProperty()
-  category: string;
+  categoryId: number;
 
   @IsNotEmpty()
   @ApiModelProperty()
-  type: string;
+  typeId: number;
 }

@@ -1,40 +1,43 @@
-import { Injectable, BadRequestException, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpException,
+  Param,
+  NotFoundException,
+  HttpStatus,
+} from '@nestjs/common';
 import { User } from '../../models/User';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { hashSync } from 'bcrypt';
-import { CreateUserDto } from './dto/create.dto';
+import { CreateUserDto } from './dto/create';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { ActivityService } from '../activity/activity.service';
 
 @Injectable()
-export class UserService {
+export class UserService extends TypeOrmCrudService<User> {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {}
-
-  async findAll(): Promise<User[]> {
-    try {
-      const data = await this.userRepository.find();
-      const dataUser = data.map(({ password, ...item }) => item);
-
-      return dataUser;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    @InjectRepository(User) repo,
+    private readonly activityService: ActivityService,
+  ) {
+    super(repo);
   }
 
-  async findById(id: string): Promise<User | undefined> {
-    try {
-      const { password, ...data } = await this.userRepository.findOne(id);
-      return data;
-    } catch (error) {
-      throw new BadRequestException(error.message);
+  async findById(id: number): Promise<User | undefined> {
+    const user = await this.repo.findOne(id, { relations: ['bookmarks'] });
+
+    if (!user) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'User not found.',
+      });
     }
+
+    return user;
   }
 
   async findByPhone(phone: string): Promise<User | undefined> {
     try {
-      return await this.userRepository.findOne({
+      return await this.repo.findOne({
         where: { phone },
       });
     } catch (error) {
@@ -50,7 +53,7 @@ export class UserService {
       if (!(await this.validPhone(user.phone)))
         throw new BadRequestException('Phone number must unique', 'phone');
 
-      return await this.userRepository.save(user);
+      return await this.repo.save(user);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -58,7 +61,7 @@ export class UserService {
 
   async validEmail(email: string): Promise<boolean> {
     try {
-      if (await this.userRepository.findOne({ where: { email } })) return false;
+      if (await this.repo.findOne({ where: { email } })) return false;
       return true;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -67,10 +70,34 @@ export class UserService {
 
   async validPhone(phone: string): Promise<boolean> {
     try {
-      if (await this.userRepository.findOne({ where: { phone } })) return false;
+      if (await this.repo.findOne({ where: { phone } })) return false;
       return true;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  async bookmarkActivity(id: number, currentUser): Promise<any> {
+    const user = await this.findById(currentUser.id);
+    const activity = await this.activityService.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'User not found.',
+      });
+    }
+
+    if (!activity) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Activity not found.',
+      });
+    }
+
+    const bookmark = await user.bookmarks.push(activity);
+    const result = await this.repo.save(user);
+
+    return { statusCode: HttpStatus.OK, data: result };
   }
 }

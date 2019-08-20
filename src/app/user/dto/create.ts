@@ -46,5 +46,5 @@ export class CreateUserDto {
   expertises?: string;
 
   @ApiModelPropertyOptional()
-  relevance_issues?: string;
+  relevanceIssues?: string;
 }

@@ -2,27 +2,33 @@ import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { Activity } from '../../models/Activity';
 import { ApiUseTags, ApiImplicitParam, ApiBearerAuth } from '@nestjs/swagger';
-import { CreateActivityDto } from './dto/create.dto';
+import { CreateActivityDto } from './dto/create';
 import { CurrentUser } from '../../custom.decorator';
 import { User } from '../../models/User';
 import { AuthGuard } from '@nestjs/passport';
-import { IService } from 'src/interfaces/IService';
+import { Crud } from '@nestjsx/crud';
 
+@Crud({
+  model: {
+    type: Activity,
+  },
+  routes: {
+    only: ['getManyBase', 'getOneBase'],
+  },
+  query: {
+    join: {
+      campaigner: {
+        allow: ['id', 'name', 'email', 'phone'],
+      },
+      category: {},
+      type: {},
+    },
+  },
+})
 @ApiUseTags('activity')
 @Controller('activity')
-export class ActivityController implements IService {
-  constructor(private readonly activityService: ActivityService) {}
-
-  @Get()
-  findAll(): Promise<Activity[]> {
-    return this.activityService.findAll();
-  }
-
-  @Get(':id')
-  @ApiImplicitParam({ name: 'id', type: 'string' })
-  findById(@Param() id: string): Promise<Activity> {
-    return this.activityService.findById(id);
-  }
+export class ActivityController {
+  constructor(private readonly service: ActivityService) {}
 
   @Post()
   @ApiBearerAuth()
@@ -31,6 +37,6 @@ export class ActivityController implements IService {
     @Body() activity: CreateActivityDto,
     @CurrentUser() user: User,
   ): Promise<Activity> {
-    return this.activityService.create(activity, user);
+    return this.service.create(activity, user);
   }
 }

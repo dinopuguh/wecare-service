@@ -3,8 +3,8 @@ import { Activity } from './Activity';
 
 @Entity()
 export class Category {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   name: string;

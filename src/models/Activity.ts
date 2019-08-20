@@ -5,8 +5,8 @@ import { Type } from './Type';
 
 @Entity()
 export class Activity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   name: string;
@@ -21,56 +21,68 @@ export class Activity {
   end: Date;
 
   @Column('timestamp')
-  register_deadline: Date;
+  registerDeadline: Date;
 
   @Column('text')
   description: string;
 
   @Column('text')
-  volunteer_tasks: string;
+  volunteerTasks: string;
 
   @Column('text')
-  volunteer_equipments: string;
+  volunteerEquipments: string;
 
   @Column('text')
-  volunteer_requirements: string;
+  volunteerRequirements: string;
 
   @Column('text')
   briefs: string;
 
   @Column('int', { nullable: true, default: 0 })
-  min_volunteers: number;
+  minVolunteers: number;
 
   @Column('int', { nullable: true, default: 0 })
-  donation_target: number;
+  donationTarget: number;
 
   @Column('int', { nullable: true, default: 0 })
-  volunteers_total: number;
+  volunteersTotal: number;
 
   @Column('int', { nullable: true, default: 0 })
-  donations_total: number;
+  donationsTotal: number;
 
   @Column({ nullable: true, default: false })
-  cashed_down: boolean;
+  cashedDown: boolean;
 
   @Column('text', { nullable: true })
   area: string;
 
   @Column('int', { nullable: true, default: 0 })
-  max_participants: number;
+  maxParticipants: number;
 
   @Column('text', { nullable: true })
-  report_text: string;
+  reportText: string;
 
   @Column('text', { nullable: true })
-  report_image: string;
+  reportImage: string;
+
+  @Column('boolean', { default: false })
+  isDone: boolean;
 
   @ManyToOne(type => Category, category => category.activities)
   category: Category;
 
+  @Column()
+  categoryId: number;
+
   @ManyToOne(type => User, user => user.activities)
   campaigner: User;
 
+  @Column()
+  campaignerId: number;
+
   @ManyToOne(type => Type, type => type.activities)
   type: Type;
+
+  @Column()
+  typeId: number;
 }

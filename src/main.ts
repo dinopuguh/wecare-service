@@ -15,6 +15,7 @@ import { ValidationPipe } from '@nestjs/common';
     .addTag('auth')
     .addTag('user')
     .addBearerAuth()
+    .setHost(process.env.BASE_URL)
     .setSchemes('http', 'https')
     .build();
   const document = SwaggerModule.createDocument(app, options);
