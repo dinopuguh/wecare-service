@@ -1,12 +1,10 @@
 import {
   Injectable,
   InternalServerErrorException,
-  HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from '../../models/Activity';
-import { CreateActivityDto } from './dto/create';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 @Injectable()
@@ -15,21 +13,25 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     super(repo);
   }
 
-  async create(activity: CreateActivityDto, user): Promise<any> {
-    const newActivity = await this.repo.create({
-      ...activity,
-      campaignerId: user.id,
+  async findById(id: number): Promise<Activity> {
+    const result = await this.repo.findOne(id, {
+      relations: ['locations', 'donations'],
     });
 
-    const result = await this.repo.save(newActivity);
-
     if (!result) {
-      throw new InternalServerErrorException({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Failed create activity.',
-      });
+      throw new NotFoundException('Activity not found.');
     }
 
-    return { statusCode: HttpStatus.CREATED, data: result };
+    return result;
+  }
+
+  async create(activity: Activity): Promise<any> {
+    const result = await this.repo.save(activity);
+
+    if (!result) {
+      throw new InternalServerErrorException();
+    }
+
+    return result;
   }
 }

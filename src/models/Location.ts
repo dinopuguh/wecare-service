@@ -12,6 +12,8 @@ export class Location {
   @PrimaryGeneratedColumn()
   id: number;
 
+  userId: number;
+
   @Column()
   name: string;
 
@@ -41,7 +43,4 @@ export class Location {
 
   @ManyToOne(type => User, user => user.locations)
   user: User;
-
-  @Column()
-  userId: number;
 }

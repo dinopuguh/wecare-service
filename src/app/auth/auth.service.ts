@@ -2,8 +2,8 @@ import {
   Injectable,
   InternalServerErrorException,
   BadRequestException,
+  HttpStatus,
 } from '@nestjs/common';
-import { sign } from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create';
@@ -16,8 +16,6 @@ export enum Provider {
 
 @Injectable()
 export class AuthService {
-  private readonly JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
@@ -33,9 +31,7 @@ export class AuthService {
         provider,
       };
 
-      const jwt: string = sign(payload, this.JWT_SECRET_KEY, {
-        expiresIn: 3600,
-      });
+      const jwt: string = this.jwtService.sign(payload);
       return jwt;
     } catch (err) {
       throw new InternalServerErrorException('validateOAuthLogin', err.message);
@@ -62,12 +58,14 @@ export class AuthService {
       );
       const payload = {
         id: userData.id,
+        name: userData.name,
         phone: userData.phone,
         email: userData.email,
       };
+
       return {
-        statusCode: 200,
-        data: { user: userData, accessToken: this.jwtService.sign(payload) },
+        user: userData,
+        accessToken: this.jwtService.sign(payload),
       };
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -76,7 +74,7 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto): Promise<User> {
     try {
-      return await this.userService.create(createUserDto);
+      return await this.userService.register(createUserDto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

@@ -17,6 +17,7 @@ import { Crud } from '@nestjsx/crud';
     },
     deleteOneBase: {
       decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
+      returnDeleted: true,
     },
     updateOneBase: {
       decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],

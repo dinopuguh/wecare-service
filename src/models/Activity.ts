@@ -1,12 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+} from 'typeorm';
 import { Category } from './Category';
 import { User } from './User';
 import { Type } from './Type';
+import { Location } from './Location';
+import { Donation } from './Donation';
+import { DonationToActivity } from './DonationToActivity';
 
 @Entity()
 export class Activity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  categoryId: number;
+  campaignerId: number;
+  typeId: number;
 
   @Column()
   name: string;
@@ -47,16 +62,16 @@ export class Activity {
   @Column('int', { nullable: true, default: 0 })
   volunteersTotal: number;
 
-  @Column('int', { nullable: true, default: 0 })
+  @Column('int', { default: 0 })
   donationsTotal: number;
 
-  @Column({ nullable: true, default: false })
+  @Column({ default: false })
   cashedDown: boolean;
 
   @Column('text', { nullable: true })
   area: string;
 
-  @Column('int', { nullable: true, default: 0 })
+  @Column('int', { default: 0 })
   maxParticipants: number;
 
   @Column('text', { nullable: true })
@@ -71,18 +86,19 @@ export class Activity {
   @ManyToOne(type => Category, category => category.activities)
   category: Category;
 
-  @Column()
-  categoryId: number;
-
   @ManyToOne(type => User, user => user.activities)
   campaigner: User;
-
-  @Column()
-  campaignerId: number;
 
   @ManyToOne(type => Type, type => type.activities)
   type: Type;
 
-  @Column()
-  typeId: number;
+  @ManyToMany(type => Location)
+  @JoinTable()
+  locations: Location[];
+
+  @OneToMany(
+    type => DonationToActivity,
+    donationToActivity => donationToActivity.activity,
+  )
+  donations: DonationToActivity[];
 }

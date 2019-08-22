@@ -16,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
     },
     deleteOneBase: {
       decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
+      returnDeleted: true,
     },
     updateOneBase: {
       decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
