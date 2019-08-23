@@ -9,8 +9,8 @@ import {
 } from 'typeorm';
 import { Activity } from './Activity';
 import { Location } from './Location';
-import { Donation } from './Donation';
 import { ActivityToUser } from './ActivityToUser';
+import { DonationToActivity } from './DonationToActivity';
 
 @Entity()
 @Unique(['phone', 'email'])
@@ -67,8 +67,11 @@ export class User {
   @JoinTable()
   bookmarks: Activity[];
 
-  @OneToMany(type => Donation, donation => donation.user)
-  donations: Donation[];
+  @OneToMany(
+    type => DonationToActivity,
+    donationToActivity => donationToActivity.user,
+  )
+  donatedActivities: DonationToActivity[];
 
   @OneToMany(type => ActivityToUser, activityToUser => activityToUser.user)
   followedActivities: ActivityToUser[];

@@ -16,12 +16,12 @@ import { User } from '../../models/User';
 import { AuthGuard } from '@nestjs/passport';
 import { Crud } from '@nestjsx/crud';
 import { CreateLocationDto } from '../location/dto/create';
-import { CreateDonationDto } from '../donation/dto/create';
 import { LocationService } from '../location/location.service';
 import { DonationActivityService } from '../donation-activity/donation-activity.service';
-import { DonationService } from '../donation/donation.service';
-import { ICreateDonation } from '../donation/interfaces/create-donation.interface';
 import { ICreateLocation } from '../location/interfaces/create-location.interface';
+import { AddDonationDto } from './dto/add-donation';
+import { IAddDonation } from './interface/add-donation.interface';
+import { UserService } from '../user/user.service';
 
 @Crud({
   model: {
@@ -48,7 +48,7 @@ export class ActivityController {
   constructor(
     private readonly service: ActivityService,
     private readonly locationService: LocationService,
-    private readonly donationService: DonationService,
+    private readonly userService: UserService,
     private readonly donationActivityService: DonationActivityService,
   ) {}
 
@@ -57,6 +57,16 @@ export class ActivityController {
     const activity = await this.service.findById(id, [
       'volunteers',
       'volunteers.user',
+    ]);
+
+    return activity;
+  }
+
+  @Get('donations/:id')
+  async getDonations(@Param('id') id: number): Promise<Activity> {
+    const activity = await this.service.findById(id, [
+      'donations',
+      'donations.user',
     ]);
 
     return activity;
@@ -108,33 +118,41 @@ export class ActivityController {
   @UseGuards(AuthGuard('jwt'))
   async addDonation(
     @Param('id') id: number,
-    @Body() donation: CreateDonationDto,
+    @Body() donation: AddDonationDto,
     @CurrentUser() currentUser: User,
   ): Promise<any> {
     const activity = await this.service.findById(id, ['donations']);
+    const user = await this.userService.findById(currentUser.id, [
+      'donatedActivities',
+    ]);
 
-    const newDonation: ICreateDonation = {
+    const newDonation: IAddDonation = {
       ...donation,
-      userId: currentUser.id,
+      userId: user.id,
+      activityId: activity.id,
     };
 
-    const createDonation = await this.donationService.create(newDonation);
+    const donationActivity = await this.donationActivityService.create(
+      newDonation,
+    );
 
-    const donationActivity = await this.donationActivityService.create({
-      donationId: createDonation.id,
-      activityId: activity.id,
-    });
+    const donations = await activity.donations.push(donationActivity);
 
-    const pushDonation = await activity.donations.push(donationActivity);
-
-    if (!pushDonation) {
+    if (!donations) {
       throw new InternalServerErrorException(
         'Failed to add donation to activity.',
       );
     }
 
-    const result = await this.service.create(activity);
+    const donated = await user.donatedActivities.push(donationActivity);
 
-    return result;
+    if (!donated) {
+      throw new InternalServerErrorException('Failed to add donation to user.');
+    }
+
+    const resultUser = await this.userService.create(user);
+    const resultActivity = await this.service.create(activity);
+
+    return activity;
   }
 }

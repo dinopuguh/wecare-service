@@ -78,6 +78,16 @@ export class UserController {
     return user;
   }
 
+  @Get('donated-activities/:id')
+  async getDonatedActivities(@Param('id') id: number): Promise<User> {
+    const user = await this.service.findById(id, [
+      'donatedActivities',
+      'donatedActivities.activity',
+    ]);
+
+    return user;
+  }
+
   @Patch('bookmark-activity/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

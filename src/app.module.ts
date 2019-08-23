@@ -10,7 +10,6 @@ import { CategoryModule } from './app/category/category.module';
 import { LocationModule } from './app/location/location.module';
 import { ConfigModule } from './app/config/config.module';
 import { TypeModule } from './app/type/type.module';
-import { DonationModule } from './app/donation/donation.module';
 import { DonationActivityModule } from './app/donation-activity/donation-activity.module';
 import { ActivityUserModule } from './app/activity-user/activity-user.module';
 
@@ -24,7 +23,6 @@ import { ActivityUserModule } from './app/activity-user/activity-user.module';
     LocationModule,
     ConfigModule,
     TypeModule,
-    DonationModule,
     DonationActivityModule,
     ActivityUserModule,
   ],

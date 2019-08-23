@@ -11,7 +11,6 @@ import { Category } from './Category';
 import { User } from './User';
 import { Type } from './Type';
 import { Location } from './Location';
-import { Donation } from './Donation';
 import { DonationToActivity } from './DonationToActivity';
 import { ActivityToUser } from './ActivityToUser';
 
