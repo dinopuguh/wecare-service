@@ -16,9 +16,9 @@ export class UserService extends TypeOrmCrudService<User> {
     super(repo);
   }
 
-  async findById(id: number): Promise<User | undefined> {
+  async findById(id: number, relations: string[]): Promise<User | undefined> {
     const user = await this.repo.findOne(id, {
-      relations: ['bookmarks', 'followedActivities'],
+      relations,
     });
 
     if (!user) {
@@ -75,6 +75,16 @@ export class UserService extends TypeOrmCrudService<User> {
 
     if (!result) {
       throw new InternalServerErrorException('Failed to save user.');
+    }
+
+    return result;
+  }
+
+  async replace(user: User): Promise<User | any> {
+    const result = await this.repo.update(user.id, user);
+
+    if (!result) {
+      throw new InternalServerErrorException('Failed replace user.');
     }
 
     return result;

@@ -6,7 +6,6 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
-  RelationId,
 } from 'typeorm';
 import { Activity } from './Activity';
 import { Location } from './Location';

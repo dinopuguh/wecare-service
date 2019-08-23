@@ -1,7 +1,11 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityToUser } from '../../models/ActivityToUser';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import { CreateActivityUserDto } from './dto/create';
 
 @Injectable()
@@ -21,5 +25,18 @@ export class ActivityUserService {
     }
 
     return activityUser;
+  }
+
+  async delete(activityId: number, userId: number): Promise<any | boolean> {
+    const activityUser = await this.repo.delete({
+      activityId,
+      userId,
+    });
+
+    if (!activityUser.affected) {
+      return false;
+    }
+
+    return true;
   }
 }

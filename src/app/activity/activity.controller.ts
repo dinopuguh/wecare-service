@@ -52,6 +52,16 @@ export class ActivityController {
     private readonly donationActivityService: DonationActivityService,
   ) {}
 
+  @Get('volunteers/:id')
+  async getVolunteers(@Param('id') id: number): Promise<Activity> {
+    const activity = await this.service.findById(id, [
+      'volunteers',
+      'volunteers.user',
+    ]);
+
+    return activity;
+  }
+
   @Post()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -73,7 +83,7 @@ export class ActivityController {
     @Body() location: CreateLocationDto,
     @CurrentUser() currentUser: User,
   ): Promise<any> {
-    const activity = await this.service.findById(id);
+    const activity = await this.service.findById(id, ['locations']);
 
     const newLocation: ICreateLocation = {
       ...location,
@@ -101,7 +111,7 @@ export class ActivityController {
     @Body() donation: CreateDonationDto,
     @CurrentUser() currentUser: User,
   ): Promise<any> {
-    const activity = await this.service.findById(id);
+    const activity = await this.service.findById(id, ['donations']);
 
     const newDonation: ICreateDonation = {
       ...donation,

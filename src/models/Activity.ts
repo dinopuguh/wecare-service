@@ -13,6 +13,7 @@ import { Type } from './Type';
 import { Location } from './Location';
 import { Donation } from './Donation';
 import { DonationToActivity } from './DonationToActivity';
+import { ActivityToUser } from './ActivityToUser';
 
 @Entity()
 export class Activity {
@@ -101,4 +102,7 @@ export class Activity {
     donationToActivity => donationToActivity.activity,
   )
   donations: DonationToActivity[];
+
+  @OneToMany(type => ActivityToUser, activityToUser => activityToUser.activity)
+  volunteers: ActivityToUser[];
 }

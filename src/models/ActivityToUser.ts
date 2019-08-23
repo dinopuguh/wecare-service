@@ -11,9 +11,9 @@ export class ActivityToUser {
   userId: number;
 
   @Column({ default: false })
-  isVerified?: boolean;
+  isPresent?: boolean;
 
-  @ManyToOne(type => Activity)
+  @ManyToOne(type => Activity, activity => activity.volunteers)
   activity: Activity;
 
   @ManyToOne(type => User, user => user.followedActivities)

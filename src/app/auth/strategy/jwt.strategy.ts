@@ -15,7 +15,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     try {
       done(null, payload);
     } catch (err) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        'Please sign in to access this endpoint.',
+      );
     }
   }
 }

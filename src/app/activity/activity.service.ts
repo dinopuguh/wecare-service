@@ -13,9 +13,9 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     super(repo);
   }
 
-  async findById(id: number): Promise<Activity> {
+  async findById(id: number, relations: string[]): Promise<Activity> {
     const result = await this.repo.findOne(id, {
-      relations: ['locations', 'donations'],
+      relations,
     });
 
     if (!result) {
@@ -25,11 +25,21 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     return result;
   }
 
-  async create(activity: Activity): Promise<any> {
+  async create(activity: Activity): Promise<Activity> {
     const result = await this.repo.save(activity);
 
     if (!result) {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException('Failed save activity.');
+    }
+
+    return result;
+  }
+
+  async replace(activity: Activity): Promise<Activity | any> {
+    const result = await this.repo.update(activity.id, activity);
+
+    if (!result) {
+      throw new InternalServerErrorException('Failed replace activity.');
     }
 
     return result;
