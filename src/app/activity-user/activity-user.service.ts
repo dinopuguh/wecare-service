@@ -15,25 +15,32 @@ export class ActivityUserService {
     private readonly repo: Repository<ActivityToUser>,
   ) {}
 
-  async create(object: CreateActivityUserDto): Promise<ActivityToUser> {
-    const activityUser = await this.repo.save(object);
+  async findById(activityId: number, userId: number): Promise<ActivityToUser> {
+    const activityUser = await this.repo.findOne({
+      where: { userId, activityId },
+    });
 
     if (!activityUser) {
-      throw new InternalServerErrorException(
-        'Failed to save donation activity.',
-      );
+      return null;
     }
 
     return activityUser;
   }
 
-  async delete(activityId: number, userId: number): Promise<any | boolean> {
-    const activityUser = await this.repo.delete({
-      activityId,
-      userId,
-    });
+  async create(object: CreateActivityUserDto): Promise<ActivityToUser> {
+    const activityUser = await this.repo.save(object);
 
-    if (!activityUser.affected) {
+    if (!activityUser) {
+      throw new InternalServerErrorException('Failed to save activity user.');
+    }
+
+    return activityUser;
+  }
+
+  async delete(id: number): Promise<any | boolean> {
+    const deleteActivityUser = await this.repo.delete(id);
+
+    if (!deleteActivityUser.affected) {
       return false;
     }
 

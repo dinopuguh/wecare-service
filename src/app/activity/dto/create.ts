@@ -1,6 +1,5 @@
-import { IsNotEmpty, IsDate, IsDateString } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { Category } from 'src/models/Category';
 
 export class CreateActivityDto {
   @IsNotEmpty()

@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from '../../models/Activity';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { ICreateActivity } from './interface/create-activity.interface';
 
 @Injectable()
 export class ActivityService extends TypeOrmCrudService<Activity> {
@@ -13,7 +14,7 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     super(repo);
   }
 
-  async findById(id: number, relations: string[]): Promise<Activity> {
+  async findById(id: number, relations?: string[]): Promise<Activity> {
     const result = await this.repo.findOne(id, {
       relations,
     });
@@ -25,7 +26,7 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     return result;
   }
 
-  async create(activity: Activity): Promise<Activity> {
+  async save(activity: Activity): Promise<Activity> {
     const result = await this.repo.save(activity);
 
     if (!result) {
@@ -35,11 +36,11 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     return result;
   }
 
-  async replace(activity: Activity): Promise<Activity | any> {
-    const result = await this.repo.update(activity.id, activity);
+  async create(activity: ICreateActivity): Promise<Activity> {
+    const result = await this.repo.save(activity);
 
     if (!result) {
-      throw new InternalServerErrorException('Failed replace activity.');
+      throw new InternalServerErrorException('Failed save activity.');
     }
 
     return result;

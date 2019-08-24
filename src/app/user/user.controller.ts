@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Delete,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../../models/User';
@@ -86,92 +87,5 @@ export class UserController {
     ]);
 
     return user;
-  }
-
-  @Patch('bookmark-activity/:id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  async bookmarkActivity(
-    @Param('id') id: number,
-    @CurrentUser() currentUser: User,
-  ): Promise<User> {
-    const user = await this.service.findById(currentUser.id, ['bookmarks']);
-    const activity = await this.activityService.findOne(id);
-
-    const bookmarked = await user.bookmarks.push(activity);
-
-    if (!bookmarked) {
-      throw new InternalServerErrorException('Failed to bookmark activity');
-    }
-
-    const result = await this.service.create(user);
-
-    return result;
-  }
-
-  @Patch('follow-activity/:id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  async followActivity(
-    @Param('id') id: number,
-    @CurrentUser() currentUser: User,
-  ): Promise<User> {
-    const user = await this.service.findById(currentUser.id, [
-      'followedActivities',
-    ]);
-    const activity = await this.activityService.findById(id, ['volunteers']);
-
-    const activityUser = await this.activityUserService.create({
-      userId: user.id,
-      activityId: activity.id,
-    });
-
-    const followed = await user.followedActivities.push(activityUser);
-    const volunteer = await activity.volunteers.push(activityUser);
-
-    if (!followed) {
-      throw new InternalServerErrorException('Failed to follow activity');
-    }
-
-    if (!volunteer) {
-      throw new InternalServerErrorException('Failed to follow activity');
-    }
-
-    const resultActivity = await this.activityService.create(activity);
-
-    const result = await this.service.create(user);
-
-    return user;
-  }
-
-  @Patch('cancel-activity/:id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  async cancelFollowActivity(
-    @Param('id') id: number,
-    @CurrentUser() currentUser: User,
-  ): Promise<any> {
-    const user = await this.service.findOne(currentUser.id);
-
-    if (!user) {
-      throw new NotFoundException('User not found.');
-    }
-
-    const activity = await this.activityService.findOne(id);
-
-    if (!activity) {
-      throw new NotFoundException('Activity not found.');
-    }
-
-    const result = await this.activityUserService.delete(activity.id, user.id);
-
-    if (!result) {
-      throw new NotFoundException('Failed to delete, relation not found.');
-    }
-
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Cancel follow activity success.',
-    };
   }
 }

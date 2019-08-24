@@ -17,7 +17,6 @@ import { ConfigModule } from '../config/config.module';
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
-    UserModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -27,7 +26,13 @@ import { ConfigModule } from '../config/config.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, JwtStrategy, LocalStrategy],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    JwtStrategy,
+    LocalStrategy,
+    UserService,
+  ],
+  exports: [AuthService, UserService],
 })
 export class AuthModule {}

@@ -7,11 +7,17 @@ export class ActivityToUser {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column('int')
   activityId: number;
+
+  @Column('int')
   userId: number;
 
   @Column({ default: false })
   isPresent?: boolean;
+
+  @Column({ default: false })
+  isVerified?: boolean;
 
   @ManyToOne(type => Activity, activity => activity.volunteers)
   activity: Activity;

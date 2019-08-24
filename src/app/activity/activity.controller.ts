@@ -7,6 +7,8 @@ import {
   UseGuards,
   Patch,
   InternalServerErrorException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { Activity } from '../../models/Activity';
@@ -22,6 +24,9 @@ import { ICreateLocation } from '../location/interfaces/create-location.interfac
 import { AddDonationDto } from './dto/add-donation';
 import { IAddDonation } from './interface/add-donation.interface';
 import { UserService } from '../user/user.service';
+import { CreateActivityDto } from './dto/create';
+import { ICreateActivity } from './interface/create-activity.interface';
+import { ActivityUserService } from '../activity-user/activity-user.service';
 
 @Crud({
   model: {
@@ -50,6 +55,7 @@ export class ActivityController {
     private readonly locationService: LocationService,
     private readonly userService: UserService,
     private readonly donationActivityService: DonationActivityService,
+    private readonly activityUserService: ActivityUserService,
   ) {}
 
   @Get('volunteers/:id')
@@ -76,13 +82,15 @@ export class ActivityController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async create(
-    @Body() activity: Activity,
-    @CurrentUser() user: User,
+    @Body() activity: CreateActivityDto,
+    @CurrentUser() currentUser: User,
   ): Promise<Activity> {
-    return await this.service.create({
+    const createActivity: ICreateActivity = {
       ...activity,
-      campaignerId: user.id,
-    });
+      campaignerId: currentUser.id,
+    };
+
+    return await this.service.create(createActivity);
   }
 
   @Patch('add-location/:id')
@@ -108,7 +116,7 @@ export class ActivityController {
       throw new InternalServerErrorException('Failed to add location.');
     }
 
-    const result = await this.service.create(activity);
+    const result = await this.service.save(activity);
 
     return result;
   }
@@ -151,7 +159,7 @@ export class ActivityController {
     }
 
     const resultUser = await this.userService.create(user);
-    const resultActivity = await this.service.create(activity);
+    const resultActivity = await this.service.save(activity);
 
     return activity;
   }

@@ -16,7 +16,7 @@ export class UserService extends TypeOrmCrudService<User> {
     super(repo);
   }
 
-  async findById(id: number, relations: string[]): Promise<User | undefined> {
+  async findById(id: number, relations?: string[]): Promise<User | undefined> {
     const user = await this.repo.findOne(id, {
       relations,
     });
