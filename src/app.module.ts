@@ -10,8 +10,9 @@ import { CategoryModule } from './app/category/category.module';
 import { LocationModule } from './app/location/location.module';
 import { ConfigModule } from './app/config/config.module';
 import { TypeModule } from './app/type/type.module';
-import { DonationActivityModule } from './app/donation-activity/donation-activity.module';
+// import { DonationActivityModule } from './app/donation-activity/donation-activity.module';
 import { ActivityUserModule } from './app/activity-user/activity-user.module';
+import { DonationModule } from './app/donation/donation.module';
 
 @Module({
   imports: [
@@ -23,8 +24,9 @@ import { ActivityUserModule } from './app/activity-user/activity-user.module';
     LocationModule,
     ConfigModule,
     TypeModule,
-    DonationActivityModule,
+    // DonationActivityModule,
     ActivityUserModule,
+    DonationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,13 +6,13 @@ import { Activity } from '../../models/Activity';
 import { User } from '../../models/User';
 import { UserService } from '../user/user.service';
 import { Location } from '../../models/Location';
-import { DonationToActivity } from '../../models/DonationToActivity';
 import { LocationService } from '../location/location.service';
-import { DonationActivityService } from '../donation-activity/donation-activity.service';
 import { ActivityUserService } from '../activity-user/activity-user.service';
 import { ActivityToUser } from '../../models/ActivityToUser';
 import { FollowActivityController } from './follow-activity.controller';
 import { BookmarkActivityController } from './bookmark-activity.controller';
+import { Donation } from '../../models/Donation';
+import { DonationService } from '../donation/donation.service';
 
 @Module({
   imports: [
@@ -20,15 +20,15 @@ import { BookmarkActivityController } from './bookmark-activity.controller';
       Activity,
       User,
       Location,
-      DonationToActivity,
       ActivityToUser,
+      Donation,
     ]),
   ],
   providers: [
     ActivityService,
     UserService,
     LocationService,
-    DonationActivityService,
+    DonationService,
     ActivityUserService,
   ],
   controllers: [
@@ -40,8 +40,8 @@ import { BookmarkActivityController } from './bookmark-activity.controller';
     ActivityService,
     UserService,
     LocationService,
-    DonationActivityService,
     ActivityUserService,
+    DonationService,
   ],
 })
 export class ActivityModule {}

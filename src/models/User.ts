@@ -10,7 +10,7 @@ import {
 import { Activity } from './Activity';
 import { Location } from './Location';
 import { ActivityToUser } from './ActivityToUser';
-import { DonationToActivity } from './DonationToActivity';
+import { Donation } from './Donation';
 
 @Entity()
 @Unique(['phone', 'email'])
@@ -67,11 +67,8 @@ export class User {
   @JoinTable()
   bookmarks: Activity[];
 
-  @OneToMany(
-    type => DonationToActivity,
-    donationToActivity => donationToActivity.user,
-  )
-  donatedActivities: DonationToActivity[];
+  @OneToMany(type => Donation, donation => donation.user)
+  donations: Donation[];
 
   @OneToMany(type => ActivityToUser, activityToUser => activityToUser.user)
   followedActivities: ActivityToUser[];

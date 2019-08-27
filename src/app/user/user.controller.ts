@@ -56,11 +56,7 @@ import { ActivityUserService } from '../activity-user/activity-user.service';
 @ApiUseTags('user')
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly service: UserService,
-    private readonly activityService: ActivityService,
-    private readonly activityUserService: ActivityUserService,
-  ) {}
+  constructor(private readonly service: UserService) {}
 
   @Get('bookmarked-activities/:id')
   async getBookmarked(@Param('id') id: number): Promise<User> {
@@ -82,8 +78,8 @@ export class UserController {
   @Get('donated-activities/:id')
   async getDonatedActivities(@Param('id') id: number): Promise<User> {
     const user = await this.service.findById(id, [
-      'donatedActivities',
-      'donatedActivities.activity',
+      'donations',
+      'donations.user',
     ]);
 
     return user;

@@ -1,20 +1,14 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToMany,
-  ManyToOne,
-  Column,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Activity } from './Activity';
 import { User } from './User';
 
 @Entity()
-export class DonationToActivity {
+export class Donation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  userId: number;
   activityId: number;
+  userId: number;
 
   @Column('int')
   amount: number;
@@ -25,9 +19,9 @@ export class DonationToActivity {
   @Column({ default: false })
   isVerified: boolean;
 
-  @ManyToOne(type => User, user => user.donatedActivities)
-  user: User;
-
   @ManyToOne(type => Activity, activity => activity.donations)
   activity: Activity;
+
+  @ManyToOne(type => User, user => user.donations)
+  user: User;
 }

@@ -11,8 +11,8 @@ import { Category } from './Category';
 import { User } from './User';
 import { Type } from './Type';
 import { Location } from './Location';
-import { DonationToActivity } from './DonationToActivity';
 import { ActivityToUser } from './ActivityToUser';
+import { Donation } from './Donation';
 
 @Entity()
 export class Activity {
@@ -96,11 +96,8 @@ export class Activity {
   @JoinTable()
   locations: Location[];
 
-  @OneToMany(
-    type => DonationToActivity,
-    donationToActivity => donationToActivity.activity,
-  )
-  donations: DonationToActivity[];
+  @OneToMany(type => Donation, donation => donation.activity)
+  donations: Donation[];
 
   @OneToMany(type => ActivityToUser, activityToUser => activityToUser.activity)
   volunteers: ActivityToUser[];
