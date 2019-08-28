@@ -12,6 +12,7 @@ export class Location {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column('int')
   userId: number;
 
   @Column()

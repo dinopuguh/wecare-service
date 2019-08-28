@@ -7,7 +7,10 @@ export class Donation {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column('int')
   activityId: number;
+
+  @Column('int')
   userId: number;
 
   @Column('int')

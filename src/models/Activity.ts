@@ -19,8 +19,13 @@ export class Activity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column('int')
   categoryId: number;
+
+  @Column('int')
   campaignerId: number;
+
+  @Column('int')
   typeId: number;
 
   @Column()
