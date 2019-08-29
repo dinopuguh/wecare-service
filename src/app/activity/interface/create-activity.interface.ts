@@ -1,7 +1,7 @@
 export interface ICreateActivity {
   name: string;
 
-  photo: string;
+  photo: any;
 
   start: string;
 

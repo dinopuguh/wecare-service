@@ -5,6 +5,8 @@ import {
   Body,
   Param,
   InternalServerErrorException,
+  Patch,
+  NotFoundException,
 } from '@nestjs/common';
 import { DonationService } from './donation.service';
 import { UserService } from '../user/user.service';
@@ -16,6 +18,7 @@ import { User } from '../../models/User';
 import { ActivityService } from '../activity/activity.service';
 import { ICreateDonation } from './interface/create-donation.interface';
 import { Donation } from '../../models/Donation';
+import { VerifyDonationDto } from './dto/verify-donation.dto';
 
 @ApiUseTags('donation')
 @Controller('donation')
@@ -26,20 +29,20 @@ export class DonationController {
     private readonly activityService: ActivityService,
   ) {}
 
-  @Post()
+  @Patch('activity/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async create(
+    @Param('id') id: number,
     @Body() donation: CreateDonationDto,
     @CurrentUser() currentUser: User,
   ): Promise<Donation> {
+    const activity = await this.activityService.findById(id, ['donations']);
     const user = await this.userService.findById(currentUser.id, ['donations']);
-    const activity = await this.activityService.findById(donation.activityId, [
-      'donations',
-    ]);
 
     const createDonation: ICreateDonation = {
       ...donation,
+      activityId: activity.id,
       userId: user.id,
     };
 
@@ -64,5 +67,55 @@ export class DonationController {
     const resultUser = await this.userService.create(user);
 
     return saveDonation;
+  }
+
+  @Patch('verify/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  async verify(@Param('id') id: number): Promise<Donation> {
+    const donation = await this.service.findById(id);
+
+    const activity = donation.activity;
+
+    if (!donation) {
+      throw new NotFoundException('Donation not found.');
+    }
+
+    if (!donation.isVerified) {
+      donation.isVerified = true;
+
+      activity.donationsTotal += donation.amount;
+    }
+
+    const resultDonation = await this.service.create(donation);
+
+    const resultActivity = await this.activityService.save(activity);
+
+    return resultDonation;
+  }
+
+  @Patch('cancel-verify/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  async cancelVerify(@Param('id') id: number): Promise<Donation> {
+    const donation = await this.service.findById(id);
+
+    const activity = await this.activityService.findById(donation.activityId);
+
+    if (!donation) {
+      throw new NotFoundException('Donation not found.');
+    }
+
+    if (donation.isVerified) {
+      donation.isVerified = false;
+
+      activity.donationsTotal -= donation.amount;
+    }
+
+    const resultDonation = await this.service.create(donation);
+
+    const resultActivity = await this.activityService.save(activity);
+
+    return resultDonation;
   }
 }

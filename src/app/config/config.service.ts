@@ -13,4 +13,16 @@ export class ConfigService {
   get jwtSecretKey(): string {
     return this.envConfig.JWT_SECRET_KEY;
   }
+
+  get cloudinaryCloudName(): string {
+    return this.envConfig.CLOUDINARY_CLOUD_NAME;
+  }
+
+  get cloudinaryApiKey(): string {
+    return this.envConfig.CLOUDINARY_API_KEY;
+  }
+
+  get cloudinaryApiSecret(): string {
+    return this.envConfig.CLOUDINARY_API_SECRET;
+  }
 }

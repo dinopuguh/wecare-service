@@ -1,16 +1,12 @@
 import { IsNotEmpty } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
-export class CreateDonationDto {
+export class VerifyDonationDto {
   @IsNotEmpty()
   @ApiModelProperty()
-  amount: number;
+  activityId: number;
 
   @IsNotEmpty()
   @ApiModelProperty()
-  transferValidation: string;
-
-  // @IsNotEmpty()
-  // @ApiModelProperty()
-  // activityId: number;
+  userId: number;
 }

@@ -7,24 +7,28 @@ import {
   UseGuards,
   Patch,
   InternalServerErrorException,
+  UseInterceptors,
+  UploadedFile,
+  Req,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ActivityService } from './activity.service';
 import { Activity } from '../../models/Activity';
-import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiUseTags,
+  ApiBearerAuth,
+  ApiImplicitFile,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { CurrentUser } from '../../custom.decorator';
 import { User } from '../../models/User';
 import { AuthGuard } from '@nestjs/passport';
 import { Crud } from '@nestjsx/crud';
 import { CreateLocationDto } from '../location/dto/create';
 import { LocationService } from '../location/location.service';
-// import { DonationActivityService } from '../donation-activity/donation-activity.service';
 import { ICreateLocation } from '../location/interfaces/create-location.interface';
-import { AddDonationDto } from './dto/add-donation';
-import { IAddDonation } from './interface/add-donation.interface';
-import { UserService } from '../user/user.service';
 import { CreateActivityDto } from './dto/create';
 import { ICreateActivity } from './interface/create-activity.interface';
-import { ActivityUserService } from '../activity-user/activity-user.service';
 
 @Crud({
   model: {
@@ -51,9 +55,6 @@ export class ActivityController {
   constructor(
     private readonly service: ActivityService,
     private readonly locationService: LocationService,
-    private readonly userService: UserService,
-    // private readonly donationActivityService: DonationActivityService,
-    private readonly activityUserService: ActivityUserService,
   ) {}
 
   @Get('volunteers/:id')
@@ -78,13 +79,20 @@ export class ActivityController {
 
   @Post()
   @ApiBearerAuth()
+  @ApiImplicitFile({ name: 'photo', required: true })
+  @ApiConsumes('multipart/form-data')
   @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('photo'))
   async create(
+    @UploadedFile() photo,
     @Body() activity: CreateActivityDto,
     @CurrentUser() currentUser: User,
   ): Promise<Activity> {
+    // console.log(photo);
+
     const createActivity: ICreateActivity = {
       ...activity,
+      photo: photo,
       campaignerId: currentUser.id,
     };
 
@@ -118,47 +126,4 @@ export class ActivityController {
 
     return result;
   }
-
-  // @Patch('add-donation/:id')
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard('jwt'))
-  // async addDonation(
-  //   @Param('id') id: number,
-  //   @Body() donation: AddDonationDto,
-  //   @CurrentUser() currentUser: User,
-  // ): Promise<any> {
-  //   const activity = await this.service.findById(id, ['donations']);
-  //   const user = await this.userService.findById(currentUser.id, [
-  //     'donatedActivities',
-  //   ]);
-
-  //   const newDonation: IAddDonation = {
-  //     ...donation,
-  //     userId: user.id,
-  //     activityId: activity.id,
-  //   };
-
-  //   const donationActivity = await this.donationActivityService.create(
-  //     newDonation,
-  //   );
-
-  //   const donations = await activity.donations.push(donationActivity);
-
-  //   if (!donations) {
-  //     throw new InternalServerErrorException(
-  //       'Failed to add donation to activity.',
-  //     );
-  //   }
-
-  //   const donated = await user.donatedActivities.push(donationActivity);
-
-  //   if (!donated) {
-  //     throw new InternalServerErrorException('Failed to add donation to user.');
-  //   }
-
-  //   const resultUser = await this.userService.create(user);
-  //   const resultActivity = await this.service.save(activity);
-
-  //   return activity;
-  // }
 }

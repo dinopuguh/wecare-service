@@ -61,6 +61,8 @@ export class FollowActivityController {
       throw new InternalServerErrorException('Failed to follow activity');
     }
 
+    activity.volunteersTotal = activity.volunteers.length;
+
     const resultActivity = await this.activityService.save(activity);
 
     const result = await this.userService.create(user);
@@ -80,7 +82,7 @@ export class FollowActivityController {
       'followedActivities.activity',
     ]);
 
-    const activity = await this.activityService.findById(id);
+    const activity = await this.activityService.findById(id, ['volunteers']);
 
     const activityUser = await this.activityUserService.findById(
       activity.id,
@@ -102,6 +104,16 @@ export class FollowActivityController {
     );
 
     user.followedActivities = unfollowActivity;
+
+    const cancelVolunteer = await activity.volunteers.filter(
+      u => u.id !== activityUser.id,
+    );
+
+    activity.volunteers = cancelVolunteer;
+
+    activity.volunteersTotal = activity.volunteers.length;
+
+    const resultActivity = await this.activityService.save(activity);
 
     const resultUser = await this.userService.create(user);
 
