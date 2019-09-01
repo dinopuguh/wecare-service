@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '../user/dto/create';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthLoginDto } from './dto/login.dto';
 import { CurrentUser } from '../../custom.decorator';

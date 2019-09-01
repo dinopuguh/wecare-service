@@ -7,7 +7,7 @@ import {
 import { User } from '../../models/User';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hashSync } from 'bcrypt';
-import { CreateUserDto } from './dto/create';
+import { CreateUserDto } from './dto/create-user.dto';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 @Injectable()

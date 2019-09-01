@@ -6,10 +6,6 @@ export class CreateActivityDto {
   @ApiModelProperty()
   name: string;
 
-  // @IsNotEmpty()
-  // @ApiModelProperty()
-  // photo: string;
-
   @IsNotEmpty()
   @ApiModelProperty()
   start: string;

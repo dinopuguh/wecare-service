@@ -30,7 +30,6 @@ import { CurrentUser } from '../../custom.decorator';
   },
   query: {
     join: {
-      donations: {},
       activities: {},
     },
   },
