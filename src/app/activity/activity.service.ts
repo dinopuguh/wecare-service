@@ -38,9 +38,9 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
   }
 
   async create(activity: ICreateActivity): Promise<Activity> {
-    const photo = await this.uploadImageToCloudinary(activity.photo);
+    // const photo = await this.upload(activity.photo);
 
-    activity.photo = photo.secure_url;
+    // activity.photo = photo.secure_url;
 
     const result = await this.repo.save(activity);
 
@@ -51,7 +51,7 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     return result;
   }
 
-  uploadImageToCloudinary(image): Promise<any> {
+  upload(image): Promise<any> {
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;

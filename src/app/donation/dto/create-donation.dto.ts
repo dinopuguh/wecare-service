@@ -6,11 +6,11 @@ export class CreateDonationDto {
   @ApiModelProperty()
   amount: number;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
-  transferValidation: string;
-
   // @IsNotEmpty()
   // @ApiModelProperty()
-  // activityId: number;
+  // transferValidation: string;
+
+  @IsNotEmpty()
+  @ApiModelProperty()
+  activityId: number;
 }

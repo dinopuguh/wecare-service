@@ -7,11 +7,12 @@ import { User } from '../../models/User';
 import { UserService } from '../user/user.service';
 import { ActivityService } from '../activity/activity.service';
 import { Activity } from '../../models/Activity';
+import { UploadService } from '../upload/upload.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Donation, User, Activity])],
-  providers: [DonationService, UserService, ActivityService],
+  providers: [DonationService, UserService, ActivityService, UploadService],
   controllers: [DonationController],
-  exports: [DonationService, UserService, ActivityService],
+  exports: [DonationService, UserService, ActivityService, UploadService],
 })
 export class DonationModule {}

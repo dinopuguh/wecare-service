@@ -2,61 +2,46 @@ import {
   Controller,
   Get,
   Param,
-  Post,
-  Patch,
   UseGuards,
-  InternalServerErrorException,
-  NotFoundException,
-  Delete,
-  HttpStatus,
-  BadRequestException,
+  Patch,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../../models/User';
-import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiUseTags,
+  ApiBearerAuth,
+  ApiImplicitFile,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
-import { CurrentUser } from '../../custom.decorator';
 import { AuthGuard } from '@nestjs/passport';
-import { ActivityService } from '../activity/activity.service';
-import { ActivityUserService } from '../activity-user/activity-user.service';
+import { UploadService } from '../upload/upload.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CurrentUser } from '../../custom.decorator';
 
 @Crud({
   model: {
     type: User,
   },
   routes: {
-    only: [
-      'getManyBase',
-      'getOneBase',
-      'updateOneBase',
-      'replaceOneBase',
-      'deleteOneBase',
-    ],
-    updateOneBase: {
-      decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
-    },
-    replaceOneBase: {
-      decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
-    },
-    deleteOneBase: {
-      decorators: [UseGuards(AuthGuard('jwt')), ApiBearerAuth()],
-      returnDeleted: true,
-    },
+    only: ['getManyBase', 'getOneBase'],
   },
   query: {
-    exclude: ['password'],
     join: {
-      activities: {},
-      bookmarks: {},
       donations: {},
-      followedActivities: {},
+      activities: {},
     },
   },
 })
 @ApiUseTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly service: UserService) {}
+  constructor(
+    private readonly service: UserService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get('bookmarked-activities/:id')
   async getBookmarked(@Param('id') id: number): Promise<User> {
@@ -83,5 +68,24 @@ export class UserController {
     ]);
 
     return user;
+  }
+
+  @Patch('photo')
+  @ApiBearerAuth()
+  @ApiImplicitFile({ name: 'photo', required: true })
+  @ApiConsumes('multipart/form-data')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('photo'))
+  async updatePhoto(
+    @UploadedFile() photo,
+    @CurrentUser() currentUser: User,
+  ): Promise<User> {
+    const user = await this.service.findById(currentUser.id);
+
+    const photoUrl = await this.uploadService.cloudinaryImage(photo);
+
+    user.photo = photoUrl.secure_url;
+
+    return await this.service.create(user);
   }
 }

@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './User';
 
 @Entity()
@@ -16,7 +10,10 @@ export class Location {
   userId: number;
 
   @Column()
-  name: string;
+  city: string;
+
+  @Column()
+  address: string;
 
   @Column('float')
   latitude: number;

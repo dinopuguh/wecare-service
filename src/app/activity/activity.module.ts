@@ -13,6 +13,7 @@ import { FollowActivityController } from './follow-activity.controller';
 import { BookmarkActivityController } from './bookmark-activity.controller';
 import { Donation } from '../../models/Donation';
 import { DonationService } from '../donation/donation.service';
+import { UploadService } from '../upload/upload.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DonationService } from '../donation/donation.service';
     LocationService,
     DonationService,
     ActivityUserService,
+    UploadService,
   ],
   controllers: [
     ActivityController,
@@ -42,6 +44,7 @@ import { DonationService } from '../donation/donation.service';
     LocationService,
     ActivityUserService,
     DonationService,
+    UploadService,
   ],
 })
 export class ActivityModule {}

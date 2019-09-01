@@ -1,5 +1,7 @@
 export interface ICreateLocation {
-  name: string;
+  city: string;
+
+  address: string;
 
   latitude: number;
 

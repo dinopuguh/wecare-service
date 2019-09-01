@@ -13,6 +13,7 @@ import { TypeModule } from './app/type/type.module';
 // import { DonationActivityModule } from './app/donation-activity/donation-activity.module';
 import { ActivityUserModule } from './app/activity-user/activity-user.module';
 import { DonationModule } from './app/donation/donation.module';
+import { UploadModule } from './app/upload/upload.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DonationModule } from './app/donation/donation.module';
     // DonationActivityModule,
     ActivityUserModule,
     DonationModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

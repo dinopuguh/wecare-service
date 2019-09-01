@@ -79,14 +79,4 @@ export class UserService extends TypeOrmCrudService<User> {
 
     return result;
   }
-
-  async replace(user: User): Promise<User | any> {
-    const result = await this.repo.update(user.id, user);
-
-    if (!result) {
-      throw new InternalServerErrorException('Failed replace user.');
-    }
-
-    return result;
-  }
 }

@@ -4,7 +4,11 @@ import { ApiModelProperty } from '@nestjs/swagger';
 export class CreateLocationDto {
   @IsNotEmpty()
   @ApiModelProperty()
-  name: string;
+  city: string;
+
+  @IsNotEmpty()
+  @ApiModelProperty()
+  address: string;
 
   @IsNotEmpty()
   @ApiModelProperty()
@@ -26,11 +30,15 @@ export class CreateLocationDto {
   @ApiModelProperty()
   description: string;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
-  licensePhoto: string;
+  // @IsNotEmpty()
+  // @ApiModelProperty()
+  // licensePhoto: string;
+
+  // @IsNotEmpty()
+  // @ApiModelProperty()
+  // locationPhoto: string;
 
   @IsNotEmpty()
   @ApiModelProperty()
-  locationPhoto: string;
+  activityId: number;
 }

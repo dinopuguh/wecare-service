@@ -24,11 +24,9 @@ import { CurrentUser } from '../../custom.decorator';
 import { User } from '../../models/User';
 import { AuthGuard } from '@nestjs/passport';
 import { Crud } from '@nestjsx/crud';
-import { CreateLocationDto } from '../location/dto/create';
-import { LocationService } from '../location/location.service';
-import { ICreateLocation } from '../location/interfaces/create-location.interface';
-import { CreateActivityDto } from './dto/create';
+import { CreateActivityDto } from './dto/create-activity.dto';
 import { ICreateActivity } from './interface/create-activity.interface';
+import { UploadService } from '../upload/upload.service';
 
 @Crud({
   model: {
@@ -54,7 +52,7 @@ import { ICreateActivity } from './interface/create-activity.interface';
 export class ActivityController {
   constructor(
     private readonly service: ActivityService,
-    private readonly locationService: LocationService,
+    private readonly uploadService: UploadService,
   ) {}
 
   @Get('volunteers/:id')
@@ -88,42 +86,14 @@ export class ActivityController {
     @Body() activity: CreateActivityDto,
     @CurrentUser() currentUser: User,
   ): Promise<Activity> {
-    // console.log(photo);
+    const photoUrl = await this.uploadService.cloudinaryImage(photo);
 
     const createActivity: ICreateActivity = {
       ...activity,
-      photo: photo,
+      photo: photoUrl.secure_url,
       campaignerId: currentUser.id,
     };
 
     return await this.service.create(createActivity);
-  }
-
-  @Patch('add-location/:id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  async addLocation(
-    @Param('id') id: number,
-    @Body() location: CreateLocationDto,
-    @CurrentUser() currentUser: User,
-  ): Promise<any> {
-    const activity = await this.service.findById(id, ['locations']);
-
-    const newLocation: ICreateLocation = {
-      ...location,
-      userId: currentUser.id,
-    };
-
-    const createLocation = await this.locationService.create(newLocation);
-
-    const pushLocation = await activity.locations.push(createLocation);
-
-    if (!pushLocation) {
-      throw new InternalServerErrorException('Failed to add location.');
-    }
-
-    const result = await this.service.save(activity);
-
-    return result;
   }
 }

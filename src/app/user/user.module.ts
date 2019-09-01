@@ -7,11 +7,12 @@ import { Activity } from '../../models/Activity';
 import { ActivityToUser } from '../../models/ActivityToUser';
 import { ActivityService } from '../activity/activity.service';
 import { ActivityUserService } from '../activity-user/activity-user.service';
+import { UploadService } from '../upload/upload.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Activity, ActivityToUser])],
   controllers: [UserController],
-  providers: [UserService, ActivityService, ActivityUserService],
-  exports: [UserService, ActivityService, ActivityUserService],
+  providers: [UserService, ActivityService, ActivityUserService, UploadService],
+  exports: [UserService, ActivityService, ActivityUserService, UploadService],
 })
 export class UserModule {}
