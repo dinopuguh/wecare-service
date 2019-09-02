@@ -16,9 +16,6 @@ export class ActivityToUser {
   @Column({ default: false })
   isPresent?: boolean;
 
-  @Column({ default: false })
-  isVerified?: boolean;
-
   @ManyToOne(type => Activity, activity => activity.volunteers)
   activity: Activity;
 

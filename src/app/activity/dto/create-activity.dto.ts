@@ -22,20 +22,16 @@ export class CreateActivityDto {
   @ApiModelProperty()
   description: string;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   volunteerTasks: string;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   volunteerEquipments: string;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   volunteerRequirements: string;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   briefs: string;
 
   @ApiModelPropertyOptional()
@@ -45,17 +41,9 @@ export class CreateActivityDto {
   donationTarget: number;
 
   @ApiModelPropertyOptional()
-  volunteersTotal: number;
-
-  @ApiModelPropertyOptional()
-  donationsTotal: number;
-
-  @IsNotEmpty()
-  @ApiModelProperty()
   area: string;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   maxParticipants: number;
 
   @IsNotEmpty()
@@ -65,4 +53,16 @@ export class CreateActivityDto {
   @IsNotEmpty()
   @ApiModelProperty()
   typeId: number;
+
+  @ApiModelPropertyOptional()
+  city: string;
+
+  @ApiModelPropertyOptional()
+  address: string;
+
+  @ApiModelPropertyOptional()
+  latitude: number;
+
+  @ApiModelPropertyOptional()
+  longitude: number;
 }

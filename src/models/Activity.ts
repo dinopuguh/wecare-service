@@ -6,6 +6,8 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Category } from './Category';
 import { User } from './User';
@@ -46,16 +48,16 @@ export class Activity {
   @Column('text')
   description: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   volunteerTasks: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   volunteerEquipments: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   volunteerRequirements: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   briefs: string;
 
   @Column('int', { nullable: true, default: 0 })

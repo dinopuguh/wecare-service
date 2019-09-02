@@ -19,21 +19,27 @@ export interface ICreateActivity {
 
   briefs: string;
 
-  minVolunteers: number;
+  minVolunteers?: number;
 
-  donationTarget: number;
-
-  volunteersTotal: number;
-
-  donationsTotal: number;
+  donationTarget?: number;
 
   area: string;
 
-  maxParticipants: number;
+  maxParticipants?: number;
 
   categoryId: number;
 
   typeId: number;
 
   campaignerId: number;
+
+  city?: string;
+
+  address?: string;
+
+  latitude?: number;
+
+  longitude?: number;
+
+  locationPhoto?: string;
 }

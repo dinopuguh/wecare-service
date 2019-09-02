@@ -1,21 +1,27 @@
+import { BooleanLiteral } from '@babel/types';
+
 export interface ICreateLocation {
   city: string;
 
   address: string;
 
-  latitude: number;
+  latitude?: number;
 
-  longitude: number;
+  longitude?: number;
 
-  start: string;
+  start?: string;
 
-  end: string;
+  end?: string;
 
-  description: string;
+  description?: string;
 
-  licensePhoto: string;
+  licensePhoto?: string;
 
   locationPhoto: string;
 
+  isApproved?: boolean;
+
   userId: number;
+
+  activityId: number;
 }

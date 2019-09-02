@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityToUser } from '../../models/ActivityToUser';
 import { Repository, DeleteResult } from 'typeorm';
-import { CreateActivityUserDto } from './dto/create';
+import { CreateActivityUserDto } from './dto/create-activity-user.dto';
 
 @Injectable()
 export class ActivityUserService {

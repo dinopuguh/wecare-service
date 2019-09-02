@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Post, Body, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { Category } from '../../models/Category';
-import { ApiUseTags, ApiImplicitParam, ApiBearerAuth } from '@nestjs/swagger';
-import { CreateCategoryDto } from './dto/create.dto';
+import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Crud } from '@nestjsx/crud';
 

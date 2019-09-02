@@ -15,25 +15,25 @@ export class Location {
   @Column()
   address: string;
 
-  @Column('float')
+  @Column('float', { nullable: true })
   latitude: number;
 
-  @Column('float')
+  @Column('float', { nullable: true })
   longitude: number;
 
-  @Column('timestamp')
+  @Column('timestamp', { nullable: true })
   start: Date;
 
-  @Column('timestamp')
+  @Column('timestamp', { nullable: true })
   end: Date;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   licensePhoto: string;
 
-  @Column()
+  @Column({ nullable: true })
   locationPhoto: string;
 
   @Column({ default: false })

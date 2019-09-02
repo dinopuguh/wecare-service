@@ -15,7 +15,7 @@ import {
   ApiImplicitFile,
   ApiConsumes,
 } from '@nestjs/swagger';
-import { Crud } from '@nestjsx/crud';
+import { Crud, CrudController } from '@nestjsx/crud';
 import { AuthGuard } from '@nestjs/passport';
 import { UploadService } from '../upload/upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -26,48 +26,27 @@ import { CurrentUser } from '../../custom.decorator';
     type: User,
   },
   routes: {
-    only: ['getManyBase', 'getOneBase'],
+    only: ['getManyBase', 'getOneBase', 'deleteOneBase'],
   },
   query: {
     join: {
       activities: {},
+      locations: {},
+      bookmarks: {},
+      donations: {},
+      'donations.user': {},
+      followedActivities: {},
+      'followedActivities.activity': {},
     },
   },
 })
 @ApiUseTags('user')
 @Controller('user')
-export class UserController {
+export class UserController implements CrudController<User> {
   constructor(
-    private readonly service: UserService,
+    public readonly service: UserService,
     private readonly uploadService: UploadService,
   ) {}
-
-  @Get('bookmarked-activities/:id')
-  async getBookmarked(@Param('id') id: number): Promise<User> {
-    const user = await this.service.findById(id, ['bookmarks']);
-
-    return user;
-  }
-
-  @Get('followed-activities/:id')
-  async getFollowedActivities(@Param('id') id: number): Promise<User> {
-    const user = await this.service.findById(id, [
-      'followedActivities',
-      'followedActivities.activity',
-    ]);
-
-    return user;
-  }
-
-  @Get('donated-activities/:id')
-  async getDonatedActivities(@Param('id') id: number): Promise<User> {
-    const user = await this.service.findById(id, [
-      'donations',
-      'donations.user',
-    ]);
-
-    return user;
-  }
 
   @Patch('photo')
   @ApiBearerAuth()

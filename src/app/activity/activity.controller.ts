@@ -10,8 +10,13 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Query,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { ActivityService } from './activity.service';
 import { Activity } from '../../models/Activity';
 import {
@@ -23,20 +28,28 @@ import {
 import { CurrentUser } from '../../custom.decorator';
 import { User } from '../../models/User';
 import { AuthGuard } from '@nestjs/passport';
-import { Crud } from '@nestjsx/crud';
+import {
+  Crud,
+  CrudController,
+  Override,
+  ParsedRequest,
+  CrudRequest,
+} from '@nestjsx/crud';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { ICreateActivity } from './interface/create-activity.interface';
 import { UploadService } from '../upload/upload.service';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { IUpdateActivity } from './interface/update-activity.interface';
 import { UserService } from '../user/user.service';
+import { LocationService } from '../location/location.service';
+import { ICreateLocation } from '../location/interfaces/create-location.interface';
 
 @Crud({
   model: {
     type: Activity,
   },
   routes: {
-    only: ['getManyBase'],
+    only: ['getManyBase', 'getOneBase'],
   },
   query: {
     join: {
@@ -47,30 +60,38 @@ import { UserService } from '../user/user.service';
       type: {},
       locations: {},
       donations: {},
+      volunteers: {
+        eager: true,
+      },
     },
   },
 })
 @ApiUseTags('activity')
 @Controller('activity')
-export class ActivityController {
+export class ActivityController implements CrudController<Activity> {
   constructor(
-    private readonly service: ActivityService,
+    public readonly service: ActivityService,
     private readonly userService: UserService,
     private readonly uploadService: UploadService,
+    private readonly locationService: LocationService,
   ) {}
 
-  @Get(':id')
+  get base(): CrudController<Activity> {
+    return this;
+  }
+
+  @Override('getOneBase')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async getById(
-    @Param('id') id: number,
+    @ParsedRequest() req: CrudRequest,
     @CurrentUser() currentUser: User,
   ): Promise<any> {
-    const activity = await this.service.findById(id, ['volunteers']);
+    const activity = await this.base.getOneBase(req);
 
     const user = await this.userService.findById(currentUser.id, ['bookmarks']);
 
-    const bookmarked = user.bookmarks.find(a => a.id === activity.id)
+    const bookmarked = (await user.bookmarks.find(a => a.id === activity.id))
       ? true
       : false;
 
@@ -85,46 +106,69 @@ export class ActivityController {
     };
   }
 
-  @Get('volunteers/:id')
-  async getVolunteers(@Param('id') id: number): Promise<Activity> {
-    const activity = await this.service.findById(id, [
-      'volunteers',
-      'volunteers.user',
-    ]);
-
-    return activity;
-  }
-
-  @Get('donations/:id')
-  async getDonations(@Param('id') id: number): Promise<Activity> {
-    const activity = await this.service.findById(id, [
-      'donations',
-      'donations.user',
-    ]);
-
-    return activity;
-  }
-
   @Post()
   @ApiBearerAuth()
   @ApiImplicitFile({ name: 'photo', required: true })
+  @ApiImplicitFile({ name: 'locationPhoto', required: false })
   @ApiConsumes('multipart/form-data')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(FileInterceptor('photo'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'photo', maxCount: 1 },
+      { name: 'locationPhoto', maxCount: 1 },
+    ]),
+  )
   async create(
-    @UploadedFile() photo,
+    @UploadedFiles() files,
     @Body() activity: CreateActivityDto,
     @CurrentUser() currentUser: User,
   ): Promise<Activity> {
-    const photoUrl = await this.uploadService.cloudinaryImage(photo);
+    var { city, address, latitude, longitude, ...data } = activity;
 
-    const createActivity: ICreateActivity = {
-      ...activity,
+    const photoUrl = await this.uploadService.cloudinaryImage(files.photo[0]);
+
+    const newActivity: ICreateActivity = {
+      ...data,
       photo: photoUrl.secure_url,
       campaignerId: currentUser.id,
     };
 
-    return await this.service.create(createActivity);
+    const createActivity = await this.service.create(newActivity);
+
+    if (Number(activity.typeId) === 1) {
+      const updatedActivity = await this.service.findById(createActivity.id, [
+        'locations',
+      ]);
+
+      const locationPhotoUrl = await this.uploadService.cloudinaryImage(
+        files.locationPhoto[0],
+      );
+
+      const newLocation: ICreateLocation = {
+        city,
+        address,
+        latitude,
+        longitude,
+        locationPhoto: locationPhotoUrl.secure_url,
+        userId: currentUser.id,
+        activityId: updatedActivity.id,
+        isApproved: true,
+      };
+
+      const location = await this.locationService.create(newLocation);
+
+      console.log(location);
+
+      const addLocation = await updatedActivity.locations.push(location);
+
+      if (!addLocation) {
+        throw new InternalServerErrorException('Failed add location.');
+      }
+
+      return this.service.save(updatedActivity);
+    }
+
+    return createActivity;
   }
 
   @Patch('/:id')

@@ -1,7 +1,7 @@
 import { Controller, UseGuards } from '@nestjs/common';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
-import { CreateTypeDto } from './dto/create';
+import { CreateTypeDto } from './dto/create-type.dto';
 import { TypeService } from './type.service';
 import { AuthGuard } from '@nestjs/passport';
 

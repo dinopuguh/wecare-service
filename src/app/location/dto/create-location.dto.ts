@@ -1,5 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 export class CreateLocationDto {
   @IsNotEmpty()
@@ -10,12 +10,10 @@ export class CreateLocationDto {
   @ApiModelProperty()
   address: string;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   latitude: number;
 
-  @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   longitude: number;
 
   @IsNotEmpty()
@@ -29,14 +27,6 @@ export class CreateLocationDto {
   @IsNotEmpty()
   @ApiModelProperty()
   description: string;
-
-  // @IsNotEmpty()
-  // @ApiModelProperty()
-  // licensePhoto: string;
-
-  // @IsNotEmpty()
-  // @ApiModelProperty()
-  // locationPhoto: string;
 
   @IsNotEmpty()
   @ApiModelProperty()
