@@ -12,6 +12,7 @@ import {
   Req,
   Query,
   UploadedFiles,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   FileInterceptor,
@@ -58,7 +59,9 @@ import { ICreateLocation } from '../location/interfaces/create-location.interfac
       },
       category: {},
       type: {},
-      locations: {},
+      locations: {
+        eager: true,
+      },
       donations: {},
       volunteers: {
         eager: true,
@@ -89,7 +92,10 @@ export class ActivityController implements CrudController<Activity> {
   ): Promise<any> {
     const activity = await this.base.getOneBase(req);
 
-    const user = await this.userService.findById(currentUser.id, ['bookmarks']);
+    const user = await this.userService.findById(currentUser.id, [
+      'bookmarks',
+      'locations',
+    ]);
 
     const bookmarked = (await user.bookmarks.find(a => a.id === activity.id))
       ? true
@@ -99,10 +105,13 @@ export class ActivityController implements CrudController<Activity> {
       ? true
       : false;
 
+    const location = await activity.locations.find(l => l.isApproved === true);
+
     return {
       ...activity,
       bookmarked,
       followed,
+      location,
     };
   }
 
@@ -133,31 +142,38 @@ export class ActivityController implements CrudController<Activity> {
       campaignerId: currentUser.id,
     };
 
-    const createActivity = await this.service.create(newActivity);
-
     if (Number(activity.typeId) === 1) {
+      const createActivity = await this.service.create(newActivity);
+
       const updatedActivity = await this.service.findById(createActivity.id, [
         'locations',
       ]);
 
-      const locationPhotoUrl = await this.uploadService.cloudinaryImage(
-        files.locationPhoto[0],
-      );
+      if (!city) throw new BadRequestException('City is required.');
+
+      if (!address) throw new BadRequestException('Address is required.');
+
+      // const locationPhotoFile = files.locationPhoto;
+
+      // if (!locationPhotoFile)
+      //   throw new BadRequestException('Location photo is required.');
+
+      // const locationPhotoUrl = await this.uploadService.cloudinaryImage(
+      //   locationPhotoFile[0],
+      // );
 
       const newLocation: ICreateLocation = {
         city,
         address,
         latitude,
         longitude,
-        locationPhoto: locationPhotoUrl.secure_url,
+        // locationPhoto: locationPhotoUrl.secure_url,
         userId: currentUser.id,
         activityId: updatedActivity.id,
         isApproved: true,
       };
 
       const location = await this.locationService.create(newLocation);
-
-      console.log(location);
 
       const addLocation = await updatedActivity.locations.push(location);
 
@@ -167,6 +183,8 @@ export class ActivityController implements CrudController<Activity> {
 
       return this.service.save(updatedActivity);
     }
+
+    const createActivity = await this.service.create(newActivity);
 
     return createActivity;
   }

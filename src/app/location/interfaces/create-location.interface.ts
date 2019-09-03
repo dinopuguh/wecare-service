@@ -17,7 +17,7 @@ export interface ICreateLocation {
 
   licensePhoto?: string;
 
-  locationPhoto: string;
+  locationPhoto?: string;
 
   isApproved?: boolean;
 
