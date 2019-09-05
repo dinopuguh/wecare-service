@@ -9,8 +9,6 @@ import {
   InternalServerErrorException,
   UseInterceptors,
   UploadedFile,
-  Req,
-  Query,
   UploadedFiles,
   BadRequestException,
 } from '@nestjs/common';

@@ -14,6 +14,7 @@ import { BookmarkActivityController } from './bookmark-activity.controller';
 import { Donation } from '../../models/Donation';
 import { DonationService } from '../donation/donation.service';
 import { UploadService } from '../upload/upload.service';
+import { VolunteerActivityController } from './volunteer-activity.controller';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UploadService } from '../upload/upload.service';
     ActivityController,
     FollowActivityController,
     BookmarkActivityController,
+    VolunteerActivityController,
   ],
   exports: [
     ActivityService,
