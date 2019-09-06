@@ -44,6 +44,7 @@ import { LocationService } from '../location/location.service';
 import { ICreateLocation } from '../location/interfaces/create-location.interface';
 import { CreateActivityLocationDto } from './dto/create-activity-location.dto';
 import { ICreateActivityFindLocation } from './interface/create-activity-location.interface';
+import { DoneActivityDto } from './dto/done-activity.dto';
 
 @Crud({
   model: {
@@ -63,6 +64,9 @@ import { ICreateActivityFindLocation } from './interface/create-activity-locatio
         eager: true,
       },
       donations: {},
+      'donations.user': {
+        allow: ['id', 'name', 'email', 'phone'],
+      },
       volunteers: {
         eager: true,
       },
@@ -221,5 +225,29 @@ export class ActivityController implements CrudController<Activity> {
     };
 
     return await this.service.update(activity.id, updateActivity);
+  }
+
+  @Patch('done/:id')
+  @ApiImplicitFile({ name: 'photo' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('photo'))
+  async doneActivity(
+    @UploadedFile() photo,
+    @Body() report: DoneActivityDto,
+    @Param('id') id: number,
+  ): Promise<Activity> {
+    const activity = await this.service.findById(id);
+
+    activity.isDone = !activity.isDone;
+
+    const photoUrl = await this.uploadService.cloudinaryImage(photo);
+
+    activity.reportImage = photoUrl.secure_url;
+
+    activity.reportText = report.reportText;
+
+    return await this.service.save(activity);
   }
 }

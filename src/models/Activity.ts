@@ -82,6 +82,18 @@ export class Activity {
   maxParticipants: number;
 
   @Column('text', { nullable: true })
+  preparedByFacilitator: string;
+
+  @Column('text', { nullable: true })
+  activityPlan: string;
+
+  @Column('text', { nullable: true })
+  locationRequirement: string;
+
+  @Column('text', { nullable: true })
+  additionalInformation: string;
+
+  @Column('text', { nullable: true })
   reportText: string;
 
   @Column('text', { nullable: true })

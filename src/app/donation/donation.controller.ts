@@ -95,11 +95,11 @@ export class DonationController {
   async verify(@Param('id') id: number): Promise<Donation> {
     const donation = await this.service.findById(id);
 
-    const activity = donation.activity;
-
     if (!donation) {
       throw new NotFoundException('Donation not found.');
     }
+
+    const activity = await this.activityService.findById(donation.activityId);
 
     if (!donation.isVerified) {
       donation.isVerified = true;
@@ -120,11 +120,11 @@ export class DonationController {
   async cancelVerify(@Param('id') id: number): Promise<Donation> {
     const donation = await this.service.findById(id);
 
-    const activity = await this.activityService.findById(donation.activityId);
-
     if (!donation) {
       throw new NotFoundException('Donation not found.');
     }
+
+    const activity = await this.activityService.findById(donation.activityId);
 
     if (donation.isVerified) {
       donation.isVerified = false;

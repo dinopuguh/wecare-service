@@ -1,7 +1,5 @@
 import {
   Controller,
-  Get,
-  Param,
   UseGuards,
   Patch,
   UseInterceptors,
@@ -34,7 +32,7 @@ import { CurrentUser } from '../../custom.decorator';
       locations: {},
       bookmarks: {},
       donations: {},
-      'donations.user': {},
+      'donations.activity': {},
       followedActivities: {},
       'followedActivities.activity': {},
     },

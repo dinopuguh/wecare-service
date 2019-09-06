@@ -9,13 +9,23 @@ export interface ICreateActivityFindLocation {
 
   description: string;
 
+  area: string;
+
+  maxParticipants?: number;
+
+  volunteersTotal: number;
+
+  preparedByFacilitator?: string;
+
+  activityPlan?: string;
+
+  locationRequirement?: string;
+
+  additionalInformation?: string;
+
   categoryId: number;
 
   typeId: number;
 
   campaignerId: number;
-
-  area: string;
-
-  maxParticipants?: number;
 }

@@ -31,5 +31,21 @@ export class CreateActivityLocationDto {
 
   @IsNotEmpty()
   @ApiModelProperty()
+  volunteersTotal: number;
+
+  @ApiModelPropertyOptional()
+  preparedByFacilitator: string;
+
+  @ApiModelPropertyOptional()
+  activityPlan: string;
+
+  @ApiModelPropertyOptional()
+  locationRequirement: string;
+
+  @ApiModelPropertyOptional()
+  additionalInformation: string;
+
+  @IsNotEmpty()
+  @ApiModelProperty()
   categoryId: number;
 }
