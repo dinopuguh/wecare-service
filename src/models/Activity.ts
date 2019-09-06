@@ -33,7 +33,7 @@ export class Activity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   photo: string;
 
   @Column('timestamp')
@@ -99,7 +99,7 @@ export class Activity {
   @ManyToOne(type => Type, type => type.activities)
   type: Type;
 
-  @ManyToMany(type => Location)
+  @ManyToMany(type => Location, { persistence: true })
   @JoinTable()
   locations: Location[];
 

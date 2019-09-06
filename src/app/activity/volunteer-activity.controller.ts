@@ -11,10 +11,10 @@ import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Activity } from '../../models/Activity';
 import { ActivityService } from './activity.service';
-import { AbsentActivityDto } from './dto/absent-activity.dto';
+import { PresenceActivityDto } from './dto/presence-activity.dto';
 import { ActivityUserService } from '../activity-user/activity-user.service';
 
-@ApiUseTags('absent-activity')
+@ApiUseTags('presence-activity')
 @Controller('activity')
 export class VolunteerActivityController {
   constructor(
@@ -22,12 +22,12 @@ export class VolunteerActivityController {
     private readonly activityUserService: ActivityUserService,
   ) {}
 
-  @Patch('absent/:id')
+  @Patch('presence/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async absentVolunteer(
     @Param('id') id: number,
-    @Body() absentActivity: AbsentActivityDto,
+    @Body() absentActivity: PresenceActivityDto,
   ): Promise<Activity> {
     const activity = await this.service.findById(id, ['volunteers']);
 

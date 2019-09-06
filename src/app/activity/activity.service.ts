@@ -6,13 +6,18 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from '../../models/Activity';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { ICreateActivity } from './interface/create-activity.interface';
+import { ICreateActivityFindVolunteers } from './interface/create-activity-volunteers.interface';
 import * as cloudinary from 'cloudinary';
 import { IUpdateActivity } from './interface/update-activity.interface';
+import { UploadService } from '../upload/upload.service';
+import { ICreateActivityFindLocation } from './interface/create-activity-location.interface';
 
 @Injectable()
 export class ActivityService extends TypeOrmCrudService<Activity> {
-  constructor(@InjectRepository(Activity) repo) {
+  constructor(
+    @InjectRepository(Activity) repo,
+    private readonly uploadService: UploadService,
+  ) {
     super(repo);
   }
 
@@ -38,11 +43,13 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     return result;
   }
 
-  async create(activity: ICreateActivity): Promise<Activity> {
+  async create(
+    activity: ICreateActivityFindVolunteers | ICreateActivityFindLocation,
+  ): Promise<Activity> {
     const result = await this.repo.save(activity);
 
     if (!result) {
-      throw new InternalServerErrorException('Failed save activity.');
+      throw new InternalServerErrorException('Failed create activity.');
     }
 
     return result;

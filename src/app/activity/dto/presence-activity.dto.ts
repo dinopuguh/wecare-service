@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
-export class AbsentActivityDto {
+export class PresenceActivityDto {
   @IsNotEmpty()
   @ApiModelProperty()
   userId: number;

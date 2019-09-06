@@ -34,14 +34,16 @@ import {
   ParsedRequest,
   CrudRequest,
 } from '@nestjsx/crud';
-import { CreateActivityDto } from './dto/create-activity.dto';
-import { ICreateActivity } from './interface/create-activity.interface';
+import { CreateActivityVolunteersDto } from './dto/create-activity-volunteers.dto';
+import { ICreateActivityFindVolunteers } from './interface/create-activity-volunteers.interface';
 import { UploadService } from '../upload/upload.service';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { IUpdateActivity } from './interface/update-activity.interface';
 import { UserService } from '../user/user.service';
 import { LocationService } from '../location/location.service';
 import { ICreateLocation } from '../location/interfaces/create-location.interface';
+import { CreateActivityLocationDto } from './dto/create-activity-location.dto';
+import { ICreateActivityFindLocation } from './interface/create-activity-location.interface';
 
 @Crud({
   model: {
@@ -113,78 +115,85 @@ export class ActivityController implements CrudController<Activity> {
     };
   }
 
-  @Post()
+  @Post('find-volunteers')
   @ApiBearerAuth()
   @ApiImplicitFile({ name: 'photo', required: true })
-  @ApiImplicitFile({ name: 'locationPhoto', required: false })
   @ApiConsumes('multipart/form-data')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'photo', maxCount: 1 },
-      { name: 'locationPhoto', maxCount: 1 },
-    ]),
-  )
-  async create(
-    @UploadedFiles() files,
-    @Body() activity: CreateActivityDto,
+  @UseInterceptors(FileInterceptor('photo'))
+  async createFindVolunteers(
+    @UploadedFile() photo,
+    @Body() activity: CreateActivityVolunteersDto,
     @CurrentUser() currentUser: User,
   ): Promise<Activity> {
-    var { city, address, latitude, longitude, ...data } = activity;
+    const { city, address, ...data } = activity;
 
-    const photoUrl = await this.uploadService.cloudinaryImage(files.photo[0]);
-
-    const newActivity: ICreateActivity = {
+    const newActivity: ICreateActivityFindVolunteers = {
       ...data,
-      photo: photoUrl.secure_url,
+      typeId: 1,
       campaignerId: currentUser.id,
     };
 
-    if (Number(activity.typeId) === 1) {
-      const createActivity = await this.service.create(newActivity);
+    const createActivity = await this.service.create(newActivity);
 
-      const updatedActivity = await this.service.findById(createActivity.id, [
-        'locations',
-      ]);
+    const updatedActivity = await this.service.findById(createActivity.id, [
+      'locations',
+    ]);
 
-      if (!city) throw new BadRequestException('City is required.');
+    const newLocation: ICreateLocation = {
+      city,
+      address,
+      // latitude,
+      // longitude,
+      // locationPhoto: locationPhotoUrl.secure_url,
+      userId: currentUser.id,
+      activityId: updatedActivity.id,
+      isApproved: true,
+    };
 
-      if (!address) throw new BadRequestException('Address is required.');
+    const location = await this.locationService.create(newLocation);
 
-      // const locationPhotoFile = files.locationPhoto;
+    const addLocation = await updatedActivity.locations.push(location);
 
-      // if (!locationPhotoFile)
-      //   throw new BadRequestException('Location photo is required.');
-
-      // const locationPhotoUrl = await this.uploadService.cloudinaryImage(
-      //   locationPhotoFile[0],
-      // );
-
-      const newLocation: ICreateLocation = {
-        city,
-        address,
-        latitude,
-        longitude,
-        // locationPhoto: locationPhotoUrl.secure_url,
-        userId: currentUser.id,
-        activityId: updatedActivity.id,
-        isApproved: true,
-      };
-
-      const location = await this.locationService.create(newLocation);
-
-      const addLocation = await updatedActivity.locations.push(location);
-
-      if (!addLocation) {
-        throw new InternalServerErrorException('Failed add location.');
-      }
-
-      return this.service.save(updatedActivity);
+    if (!addLocation) {
+      throw new InternalServerErrorException('Failed add location.');
     }
+
+    const photoUrl = await this.uploadService.cloudinaryImage(photo);
+
+    updatedActivity.photo = photoUrl.secure_url;
+
+    const result = await this.service.save(updatedActivity);
+
+    return result;
+  }
+
+  @Post('find-location')
+  @ApiBearerAuth()
+  @ApiImplicitFile({ name: 'photo', required: true })
+  @ApiConsumes('multipart/form-data')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('photo'))
+  async createFindLocation(
+    @UploadedFile() photo,
+    @Body() activity: CreateActivityLocationDto,
+    @CurrentUser() currentUser: User,
+  ): Promise<Activity> {
+    const newActivity: ICreateActivityFindLocation = {
+      ...activity,
+      typeId: 2,
+      campaignerId: currentUser.id,
+    };
 
     const createActivity = await this.service.create(newActivity);
 
-    return createActivity;
+    const photoUrl = await this.uploadService.cloudinaryImage(photo);
+
+    createActivity.photo = photoUrl.secure_url;
+
+    const result = await this.service.save(createActivity);
+
+    return result;
   }
 
   @Patch('/:id')

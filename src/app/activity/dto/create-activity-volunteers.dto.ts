@@ -1,7 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsDateString, IsNumberString } from 'class-validator';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
-export class CreateActivityDto {
+export class CreateActivityVolunteersDto {
   @IsNotEmpty()
   @ApiModelProperty()
   name: string;
@@ -22,29 +22,29 @@ export class CreateActivityDto {
   @ApiModelProperty()
   description: string;
 
-  @ApiModelPropertyOptional()
+  @IsNotEmpty()
+  @ApiModelProperty()
   volunteerTasks: string;
 
-  @ApiModelPropertyOptional()
+  @IsNotEmpty()
+  @ApiModelProperty()
   volunteerEquipments: string;
 
-  @ApiModelPropertyOptional()
+  @IsNotEmpty()
+  @ApiModelProperty()
   volunteerRequirements: string;
 
-  @ApiModelPropertyOptional()
+  @IsNotEmpty()
+  @ApiModelProperty()
   briefs: string;
 
+  @IsNotEmpty()
+  @IsNumberString()
   @ApiModelPropertyOptional()
   minVolunteers: number;
 
   @ApiModelPropertyOptional()
   donationTarget: number;
-
-  @ApiModelPropertyOptional()
-  area: string;
-
-  @ApiModelPropertyOptional()
-  maxParticipants: number;
 
   @IsNotEmpty()
   @ApiModelProperty()
@@ -52,17 +52,15 @@ export class CreateActivityDto {
 
   @IsNotEmpty()
   @ApiModelProperty()
-  typeId: number;
-
-  @ApiModelPropertyOptional()
   city: string;
 
-  @ApiModelPropertyOptional()
+  @IsNotEmpty()
+  @ApiModelProperty()
   address: string;
 
-  @ApiModelPropertyOptional()
-  latitude: number;
+  // @ApiModelPropertyOptional()
+  // latitude: number;
 
-  @ApiModelPropertyOptional()
-  longitude: number;
+  // @ApiModelPropertyOptional()
+  // longitude: number;
 }

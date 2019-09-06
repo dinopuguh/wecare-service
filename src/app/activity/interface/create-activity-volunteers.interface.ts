@@ -1,7 +1,5 @@
-export interface ICreateActivity {
+export interface ICreateActivityFindVolunteers {
   name: string;
-
-  photo: any;
 
   start: string;
 
@@ -23,23 +21,9 @@ export interface ICreateActivity {
 
   donationTarget?: number;
 
-  area: string;
-
-  maxParticipants?: number;
-
   categoryId: number;
 
   typeId: number;
 
   campaignerId: number;
-
-  city?: string;
-
-  address?: string;
-
-  latitude?: number;
-
-  longitude?: number;
-
-  locationPhoto?: string;
 }
