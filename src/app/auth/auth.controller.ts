@@ -36,12 +36,12 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @UseGuards(AuthGuard('local'))
-  login(@Body() authLoginDto: AuthLoginDto): Promise<any> {
+  login(@Body() authLoginDto: AuthLoginDto): Promise<User> {
     return this.authService.login(authLoginDto);
   }
 
   @Post('register')
-  register(@Body() createUserDto: CreateUserDto): Promise<any> {
+  register(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.authService.register(createUserDto);
   }
 

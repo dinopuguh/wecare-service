@@ -37,7 +37,7 @@ export class ActivityUserService {
     return activityUser;
   }
 
-  async delete(id: number): Promise<any | boolean> {
+  async delete(id: number): Promise<boolean> {
     const deleteActivityUser = await this.repo.delete(id);
 
     if (!deleteActivityUser.affected) {

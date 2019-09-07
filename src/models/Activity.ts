@@ -111,7 +111,7 @@ export class Activity {
   @ManyToOne(type => Type, type => type.activities)
   type: Type;
 
-  @ManyToMany(type => Location, { persistence: true })
+  @ManyToMany(type => Location)
   @JoinTable()
   locations: Location[];
 

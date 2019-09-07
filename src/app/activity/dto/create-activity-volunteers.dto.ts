@@ -58,9 +58,9 @@ export class CreateActivityVolunteersDto {
   @ApiModelProperty()
   address: string;
 
-  // @ApiModelPropertyOptional()
-  // latitude: number;
+  @ApiModelPropertyOptional()
+  latitude: number;
 
-  // @ApiModelPropertyOptional()
-  // longitude: number;
+  @ApiModelPropertyOptional()
+  longitude: number;
 }

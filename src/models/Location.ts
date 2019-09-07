@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './User';
+import { Activity } from './Activity';
 
 @Entity()
 export class Location {
@@ -29,6 +30,9 @@ export class Location {
 
   @Column('text', { nullable: true })
   description: string;
+
+  @Column('int', { nullable: true })
+  capacity: number;
 
   @Column({ nullable: true })
   licensePhoto: string;

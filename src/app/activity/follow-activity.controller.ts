@@ -76,7 +76,7 @@ export class FollowActivityController {
   async cancelFollowActivity(
     @Param('id') id: number,
     @CurrentUser() currentUser: User,
-  ): Promise<any> {
+  ): Promise<User> {
     const user = await this.userService.findById(currentUser.id, [
       'followedActivities',
       'followedActivities.activity',

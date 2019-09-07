@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Param,
@@ -9,13 +8,8 @@ import {
   InternalServerErrorException,
   UseInterceptors,
   UploadedFile,
-  UploadedFiles,
-  BadRequestException,
 } from '@nestjs/common';
-import {
-  FileInterceptor,
-  FileFieldsInterceptor,
-} from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ActivityService } from './activity.service';
 import { Activity } from '../../models/Activity';
 import {
@@ -45,6 +39,12 @@ import { ICreateLocation } from '../location/interfaces/create-location.interfac
 import { CreateActivityLocationDto } from './dto/create-activity-location.dto';
 import { ICreateActivityFindLocation } from './interface/create-activity-location.interface';
 import { DoneActivityDto } from './dto/done-activity.dto';
+import { GetOneActivityResponse } from './response/get-one-activity.response';
+
+export enum Type {
+  FIND_VOLUNTEERS = 1,
+  FIND_LOCATION = 2,
+}
 
 @Crud({
   model: {
@@ -62,6 +62,18 @@ import { DoneActivityDto } from './dto/done-activity.dto';
       type: {},
       locations: {
         eager: true,
+      },
+      'locations.user': {
+        allow: [
+          'id',
+          'name',
+          'email',
+          'phone',
+          'photo',
+          'gender',
+          'profession',
+          'domicile',
+        ],
       },
       donations: {},
       'donations.user': {
@@ -93,7 +105,7 @@ export class ActivityController implements CrudController<Activity> {
   async getById(
     @ParsedRequest() req: CrudRequest,
     @CurrentUser() currentUser: User,
-  ): Promise<any> {
+  ): Promise<GetOneActivityResponse> {
     const activity = await this.base.getOneBase(req);
 
     const user = await this.userService.findById(currentUser.id, [
@@ -130,11 +142,11 @@ export class ActivityController implements CrudController<Activity> {
     @Body() activity: CreateActivityVolunteersDto,
     @CurrentUser() currentUser: User,
   ): Promise<Activity> {
-    const { city, address, ...data } = activity;
+    const { city, address, latitude, longitude, ...data } = activity;
 
     const newActivity: ICreateActivityFindVolunteers = {
       ...data,
-      typeId: 1,
+      typeId: Type.FIND_VOLUNTEERS,
       campaignerId: currentUser.id,
     };
 
@@ -147,8 +159,8 @@ export class ActivityController implements CrudController<Activity> {
     const newLocation: ICreateLocation = {
       city,
       address,
-      // latitude,
-      // longitude,
+      latitude,
+      longitude,
       // locationPhoto: locationPhotoUrl.secure_url,
       userId: currentUser.id,
       activityId: updatedActivity.id,
@@ -185,7 +197,7 @@ export class ActivityController implements CrudController<Activity> {
   ): Promise<Activity> {
     const newActivity: ICreateActivityFindLocation = {
       ...activity,
-      typeId: 2,
+      typeId: Type.FIND_LOCATION,
       campaignerId: currentUser.id,
     };
 
@@ -240,7 +252,7 @@ export class ActivityController implements CrudController<Activity> {
   ): Promise<Activity> {
     const activity = await this.service.findById(id);
 
-    activity.isDone = !activity.isDone;
+    activity.isDone = true;
 
     const photoUrl = await this.uploadService.cloudinaryImage(photo);
 

@@ -15,6 +15,8 @@ export interface ICreateLocation {
 
   description?: string;
 
+  capacity?: number;
+
   licensePhoto?: string;
 
   locationPhoto?: string;

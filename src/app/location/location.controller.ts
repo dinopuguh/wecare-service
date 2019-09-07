@@ -6,6 +6,9 @@ import {
   InternalServerErrorException,
   UseInterceptors,
   UploadedFiles,
+  Patch,
+  Param,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiUseTags,
@@ -100,5 +103,22 @@ export class LocationController {
     const result = await this.activityService.save(activity);
 
     return createLocation;
+  }
+
+  @Patch('verify/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  async verifyLocation(@Param('id') id: number): Promise<Location> {
+    const location = await this.service.findById(id);
+
+    if (!location) {
+      throw new NotFoundException('Location not found.');
+    }
+
+    location.isApproved = true;
+
+    const verifyResult = await this.service.create(location);
+
+    return verifyResult;
   }
 }

@@ -28,6 +28,9 @@ export class CreateLocationDto {
   @ApiModelProperty()
   description: string;
 
+  @ApiModelPropertyOptional()
+  capacity: number;
+
   @IsNotEmpty()
   @ApiModelProperty()
   activityId: number;

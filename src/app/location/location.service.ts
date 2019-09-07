@@ -10,11 +10,21 @@ export class LocationService extends TypeOrmCrudService<Location> {
     super(repo);
   }
 
-  async create(location: ICreateLocation): Promise<Location> {
+  async create(location: Location | ICreateLocation): Promise<Location> {
     try {
       return await this.repo.save(location);
     } catch (error) {
       throw new InternalServerErrorException('Failed to save location.');
     }
+  }
+
+  async findById(id: number): Promise<Location> {
+    const location = await this.repo.findOne(id);
+
+    if (!location) {
+      return null;
+    }
+
+    return location;
   }
 }

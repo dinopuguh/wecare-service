@@ -27,7 +27,24 @@ import { ICreateDonation } from './interface/create-donation.interface';
 import { Donation } from '../../models/Donation';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from '../upload/upload.service';
+import { Crud } from '@nestjsx/crud';
 
+@Crud({
+  model: {
+    type: Donation,
+  },
+  routes: {
+    only: ['getOneBase', 'getManyBase'],
+  },
+  query: {
+    join: {
+      activity: {},
+      user: {
+        allow: ['id', 'name', 'email', 'phone'],
+      },
+    },
+  },
+})
 @ApiUseTags('donation')
 @Controller('donation')
 export class DonationController {

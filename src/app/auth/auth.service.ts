@@ -2,13 +2,14 @@ import {
   Injectable,
   InternalServerErrorException,
   BadRequestException,
-  HttpStatus,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { compareSync } from 'bcrypt';
 import { User } from '../../models/User';
+import { AuthLoginDto } from './dto/login.dto';
+import { LoginResponse } from './response/login.response';
 
 export enum Provider {
   GOOGLE = 'google',
@@ -38,7 +39,7 @@ export class AuthService {
     }
   }
 
-  async validateUser(phone: string, password: string): Promise<any> {
+  async validateUser(phone: string, password: string): Promise<User> {
     try {
       const user = await this.userService.findByPhone(phone);
       if (user && (await compareSync(password, user.password))) {
@@ -51,7 +52,7 @@ export class AuthService {
     }
   }
 
-  async login(user: any): Promise<any | { status: number }> {
+  async login(user: AuthLoginDto): Promise<LoginResponse> {
     try {
       const { password, ...userData } = await this.userService.findByPhone(
         user.phone,
@@ -64,7 +65,7 @@ export class AuthService {
       };
 
       return {
-        user: userData,
+        ...userData,
         accessToken: this.jwtService.sign(payload),
       };
     } catch (error) {
