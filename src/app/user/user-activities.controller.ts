@@ -12,7 +12,10 @@ export class UserActivitiesController implements CrudController<User> {
 
   @Get('done/:id')
   async getActivitiesDone(@Param('id') id: number): Promise<Activity[]> {
-    const user = await this.service.findById(id, ['activities']);
+    const user = await this.service.findById(id, [
+      'activities',
+      'activities.campaigner',
+    ]);
 
     const activities = await user.activities.filter(a => a.isDone === true);
 
@@ -21,7 +24,10 @@ export class UserActivitiesController implements CrudController<User> {
 
   @Get('undone/:id')
   async getActivitiesUndone(@Param('id') id: number): Promise<Activity[]> {
-    const user = await this.service.findById(id, ['activities']);
+    const user = await this.service.findById(id, [
+      'activities',
+      'activities.campaigner',
+    ]);
 
     const activities = await user.activities.filter(a => a.isDone === false);
 

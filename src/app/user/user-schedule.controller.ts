@@ -17,6 +17,7 @@ export class UserScheduleController implements CrudController<User> {
     const user = await this.service.findById(id, [
       'followedActivities',
       'followedActivities.activity',
+      'followedActivities.activity.campaigner',
     ]);
 
     const followed = await user.followedActivities.filter(
@@ -33,6 +34,7 @@ export class UserScheduleController implements CrudController<User> {
     const user = await this.service.findById(id, [
       'followedActivities',
       'followedActivities.activity',
+      'followedActivities.activity.campaigner',
     ]);
 
     const followed = await user.followedActivities.filter(
