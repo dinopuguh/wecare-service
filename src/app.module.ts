@@ -14,6 +14,7 @@ import { TypeModule } from './app/type/type.module';
 import { ActivityUserModule } from './app/activity-user/activity-user.module';
 import { DonationModule } from './app/donation/donation.module';
 import { UploadModule } from './app/upload/upload.module';
+import { WecarePointModule } from './app/wecare-point/wecare-point.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UploadModule } from './app/upload/upload.module';
     ActivityUserModule,
     DonationModule,
     UploadModule,
+    WecarePointModule,
   ],
   controllers: [AppController],
   providers: [AppService],

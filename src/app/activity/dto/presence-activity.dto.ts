@@ -4,5 +4,5 @@ import { ApiModelProperty } from '@nestjs/swagger';
 export class PresenceActivityDto {
   @IsNotEmpty()
   @ApiModelProperty()
-  userId: number;
+  userIds: number[];
 }

@@ -11,9 +11,7 @@ export class UserScheduleController implements CrudController<User> {
   constructor(public readonly service: UserService) {}
 
   @Get('done/:id')
-  async getFollowedActivitiesDone(
-    @Param('id') id: number,
-  ): Promise<ActivityToUser[]> {
+  async getFollowedActivitiesDone(@Param('id') id: number): Promise<any[]> {
     const user = await this.service.findById(id, [
       'followedActivities',
       'followedActivities.activity',

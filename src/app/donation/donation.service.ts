@@ -20,8 +20,10 @@ export class DonationService extends TypeOrmCrudService<Donation> {
     return newDonation;
   }
 
-  async findById(id: number): Promise<Donation> {
-    const donation = await this.repo.findOne(id);
+  async findById(id: number, relations?: string[]): Promise<Donation> {
+    const donation = await this.repo.findOne(id, {
+      relations,
+    });
 
     if (!donation) {
       return null;

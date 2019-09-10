@@ -6,8 +6,6 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Category } from './Category';
 import { User } from './User';

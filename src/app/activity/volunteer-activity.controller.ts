@@ -31,21 +31,25 @@ export class VolunteerActivityController {
   ): Promise<Activity> {
     const activity = await this.service.findById(id, ['volunteers']);
 
-    const activityUser = await activity.volunteers.find(
-      v => v.userId == absentActivity.userId,
-    );
+    absentActivity.userIds.map(async userId => {
+      const activityUser = await activity.volunteers.find(
+        v => v.userId == userId,
+      );
 
-    if (!activityUser) {
-      throw new NotFoundException('Volunteer not found.');
-    }
+      if (!activityUser) {
+        throw new NotFoundException('Volunteer not found.');
+      }
 
-    activityUser.isPresent = !activityUser.isPresent;
+      activityUser.isPresent = !activityUser.isPresent;
 
-    const result = await this.activityUserService.create(activityUser);
+      const result = await this.activityUserService.create(activityUser);
 
-    if (!result) {
-      throw new InternalServerErrorException('Failed to save activity to user');
-    }
+      if (!result) {
+        throw new InternalServerErrorException(
+          'Failed to save activity to user',
+        );
+      }
+    });
 
     return activity;
   }
