@@ -82,6 +82,7 @@ export enum Type {
       volunteers: {
         eager: true,
       },
+      'volunteers.user': {},
     },
   },
 })
