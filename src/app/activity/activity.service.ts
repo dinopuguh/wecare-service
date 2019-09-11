@@ -7,17 +7,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from '../../models/Activity';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { ICreateActivityFindVolunteers } from './interface/create-activity-volunteers.interface';
-import * as cloudinary from 'cloudinary';
 import { IUpdateActivity } from './interface/update-activity.interface';
-import { UploadService } from '../upload/upload.service';
 import { ICreateActivityFindLocation } from './interface/create-activity-location.interface';
+import { Like } from 'typeorm';
+import { type } from 'os';
 
 @Injectable()
 export class ActivityService extends TypeOrmCrudService<Activity> {
-  constructor(
-    @InjectRepository(Activity) repo,
-    private readonly uploadService: UploadService,
-  ) {
+  constructor(@InjectRepository(Activity) repo) {
     super(repo);
   }
 
@@ -67,5 +64,17 @@ export class ActivityService extends TypeOrmCrudService<Activity> {
     const newActivity = await this.repo.findOne(activity.id);
 
     return newActivity;
+  }
+
+  async search(keyword: string): Promise<Activity[]> {
+    const activities = await this.repo
+      .createQueryBuilder('activity')
+      .leftJoinAndSelect('activity.type', 'type')
+      .where('LOWER(activity.name) like :keyword', {
+        keyword: '%' + keyword.toLowerCase() + '%',
+      })
+      .getMany();
+
+    return activities;
   }
 }

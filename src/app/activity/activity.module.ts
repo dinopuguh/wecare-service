@@ -12,10 +12,14 @@ import { ActivityToUser } from '../../models/ActivityToUser';
 import { FollowActivityController } from './follow-activity.controller';
 import { BookmarkActivityController } from './bookmark-activity.controller';
 import { Donation } from '../../models/Donation';
+import { WecarePoint } from '../../models/WecarePoint';
 import { DonationService } from '../donation/donation.service';
 import { UploadService } from '../upload/upload.service';
 import { VolunteerActivityController } from './volunteer-activity.controller';
 import { SearchActivityController } from './search-activity.controller';
+import { WecarePointService } from '../wecare-point/wecare-point.service';
+import { TypeService } from '../type/type.service';
+import { Type } from '../../models/Type';
 import { Repository } from 'typeorm';
 
 @Module({
@@ -26,6 +30,8 @@ import { Repository } from 'typeorm';
       Location,
       ActivityToUser,
       Donation,
+      WecarePoint,
+      Type,
     ]),
   ],
   providers: [
@@ -35,7 +41,8 @@ import { Repository } from 'typeorm';
     DonationService,
     ActivityUserService,
     UploadService,
-    Repository,
+    WecarePointService,
+    TypeService,
   ],
   controllers: [
     ActivityController,
@@ -51,6 +58,7 @@ import { Repository } from 'typeorm';
     ActivityUserService,
     DonationService,
     UploadService,
+    WecarePointService,
   ],
 })
 export class ActivityModule {}

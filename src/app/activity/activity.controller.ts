@@ -19,7 +19,6 @@ import {
   ApiBearerAuth,
   ApiImplicitFile,
   ApiConsumes,
-  ApiImplicitQuery,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../custom.decorator';
 import { User } from '../../models/User';
@@ -43,10 +42,20 @@ import { CreateActivityLocationDto } from './dto/create-activity-location.dto';
 import { ICreateActivityFindLocation } from './interface/create-activity-location.interface';
 import { DoneActivityDto } from './dto/done-activity.dto';
 import { GetOneActivityResponse } from './response/get-one-activity.response';
+import { WecarePointService } from '../wecare-point/wecare-point.service';
 
 export enum Type {
   FIND_VOLUNTEERS = 1,
   FIND_LOCATION = 2,
+}
+
+export enum Point {
+  FIND_VOLUNTEERS = 1,
+  FIND_LOCATION = 2,
+  FOLLOW_VOLUNTEERS = 3,
+  DONATE_ACTIVITY = 4,
+  SUGGEST_LOCATION = 5,
+  LOCATION_VERIFIED = 6,
 }
 
 @Crud({
@@ -97,6 +106,7 @@ export class ActivityController implements CrudController<Activity> {
     private readonly userService: UserService,
     private readonly uploadService: UploadService,
     private readonly locationService: LocationService,
+    private readonly wecarePointService: WecarePointService,
   ) {}
 
   get base(): CrudController<Activity> {
@@ -254,9 +264,50 @@ export class ActivityController implements CrudController<Activity> {
     @Body() report: DoneActivityDto,
     @Param('id') id: number,
   ): Promise<Activity> {
-    const activity = await this.service.findById(id);
+    const activity = await this.service.findById(id, [
+      'volunteers',
+      'volunteers.user',
+      'donations',
+      'donations.user',
+      'locations',
+      'locations.user',
+    ]);
 
     activity.isDone = true;
+
+    let campaignerPoint = await this.wecarePointService.findOne(
+      Point.FIND_VOLUNTEERS,
+    );
+    if (activity.typeId === Type.FIND_LOCATION) {
+      campaignerPoint = await this.wecarePointService.findOne(
+        Point.FIND_LOCATION,
+      );
+    }
+
+    const volunteersPoint = await this.wecarePointService.findOne(
+      Point.FOLLOW_VOLUNTEERS,
+    );
+    const donorsPoint = await this.wecarePointService.findOne(
+      Point.DONATE_ACTIVITY,
+    );
+
+    await activity.volunteers.map(volunteer => {
+      if (volunteer.isPresent) {
+        volunteer.user.wecarePoint += volunteersPoint.point;
+      }
+    });
+
+    console.log(activity.volunteers);
+
+    await activity.donations.map(donation => {
+      if (donation.isVerified) {
+        donation.user.wecarePoint += donorsPoint.point;
+      }
+    });
+
+    console.log(activity.donations);
+
+    activity.campaigner.wecarePoint += campaignerPoint.point;
 
     const photoUrl = await this.uploadService.cloudinaryImage(photo);
 

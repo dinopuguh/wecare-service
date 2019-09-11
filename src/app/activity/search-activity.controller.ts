@@ -1,7 +1,6 @@
 import { Get, Query, Controller } from '@nestjs/common';
 import { ApiImplicitQuery, ApiUseTags } from '@nestjs/swagger';
 import { Activity } from '../../models/Activity';
-import { getConnection } from 'typeorm';
 import { ActivityService } from './activity.service';
 
 @ApiUseTags('activity')
@@ -11,18 +10,11 @@ export class SearchActivityController {
 
   @Get()
   @ApiImplicitQuery({ name: 'keyword', type: 'string', required: false })
-  async searchActivity(@Query('keyword') keyword: string): Promise<Activity[]> {
+  async searchActivity(@Query('keyword') keyword: string): Promise<any[]> {
     if (keyword) {
-      return await getConnection()
-        .createQueryBuilder()
-        .select('activity')
-        .from(Activity, 'activity')
-        .where('LOWER(activity.name) like :keyword', {
-          keyword: '%' + keyword.toLowerCase() + '%',
-        })
-        .getMany();
+      return this.service.search(keyword);
     }
 
-    return this.service.find();
+    return this.service.find({ relations: ['type'] });
   }
 }
