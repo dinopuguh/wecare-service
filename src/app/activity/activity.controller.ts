@@ -8,6 +8,8 @@ import {
   InternalServerErrorException,
   UseInterceptors,
   UploadedFile,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ActivityService } from './activity.service';
@@ -17,6 +19,7 @@ import {
   ApiBearerAuth,
   ApiImplicitFile,
   ApiConsumes,
+  ApiImplicitQuery,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../custom.decorator';
 import { User } from '../../models/User';

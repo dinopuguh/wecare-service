@@ -15,6 +15,8 @@ import { Donation } from '../../models/Donation';
 import { DonationService } from '../donation/donation.service';
 import { UploadService } from '../upload/upload.service';
 import { VolunteerActivityController } from './volunteer-activity.controller';
+import { SearchActivityController } from './search-activity.controller';
+import { Repository } from 'typeorm';
 
 @Module({
   imports: [
@@ -33,12 +35,14 @@ import { VolunteerActivityController } from './volunteer-activity.controller';
     DonationService,
     ActivityUserService,
     UploadService,
+    Repository,
   ],
   controllers: [
     ActivityController,
     FollowActivityController,
     BookmarkActivityController,
     VolunteerActivityController,
+    SearchActivityController,
   ],
   exports: [
     ActivityService,
