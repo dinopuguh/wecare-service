@@ -79,4 +79,40 @@ export class UserService extends TypeOrmCrudService<User> {
 
     return result;
   }
+
+  async addPoint(id: number, point: number): Promise<User> {
+    const user = await this.repo.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    user.wecarePoint += point;
+
+    const result = this.repo.save(user);
+
+    if (!result) {
+      throw new InternalServerErrorException('Failed to add point.');
+    }
+
+    return result;
+  }
+
+  async usePoint(id: number, amount: number): Promise<User> {
+    const user = await this.repo.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    user.wecarePoint -= amount;
+
+    const result = this.repo.save(user);
+
+    if (!result) {
+      throw new InternalServerErrorException('Failed to use point.');
+    }
+
+    return result;
+  }
 }

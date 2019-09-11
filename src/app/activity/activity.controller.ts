@@ -265,6 +265,7 @@ export class ActivityController implements CrudController<Activity> {
     @Param('id') id: number,
   ): Promise<Activity> {
     const activity = await this.service.findById(id, [
+      'campaigner',
       'volunteers',
       'volunteers.user',
       'donations',
@@ -274,6 +275,7 @@ export class ActivityController implements CrudController<Activity> {
     ]);
 
     activity.isDone = true;
+    activity.doneAt = new Date();
 
     let campaignerPoint = await this.wecarePointService.findOne(
       Point.FIND_VOLUNTEERS,
@@ -284,30 +286,53 @@ export class ActivityController implements CrudController<Activity> {
       );
     }
 
+    await this.userService.addPoint(
+      activity.campaignerId,
+      campaignerPoint.point,
+    );
+
     const volunteersPoint = await this.wecarePointService.findOne(
       Point.FOLLOW_VOLUNTEERS,
     );
     const donorsPoint = await this.wecarePointService.findOne(
       Point.DONATE_ACTIVITY,
     );
+    const locationsPoint = await this.wecarePointService.findOne(
+      Point.SUGGEST_LOCATION,
+    );
+    const locationVerifiedPoint = await this.wecarePointService.findOne(
+      Point.LOCATION_VERIFIED,
+    );
 
-    await activity.volunteers.map(volunteer => {
-      if (volunteer.isPresent) {
-        volunteer.user.wecarePoint += volunteersPoint.point;
-      }
-    });
+    await Promise.all(
+      activity.volunteers.map(async volunteer => {
+        if (volunteer.isPresent) {
+          return this.userService.addPoint(
+            volunteer.userId,
+            volunteersPoint.point,
+          );
+        }
+      }),
+    );
 
-    console.log(activity.volunteers);
+    await Promise.all(
+      activity.donations.map(async donation => {
+        if (donation.isVerified) {
+          return this.userService.addPoint(donation.userId, donorsPoint.point);
+        }
+      }),
+    );
 
-    await activity.donations.map(donation => {
-      if (donation.isVerified) {
-        donation.user.wecarePoint += donorsPoint.point;
-      }
-    });
-
-    console.log(activity.donations);
-
-    activity.campaigner.wecarePoint += campaignerPoint.point;
+    await Promise.all(
+      activity.locations.map(async location => {
+        if (location.isApproved) {
+          return this.userService.addPoint(
+            location.userId,
+            locationVerifiedPoint.point + locationsPoint.point,
+          );
+        }
+      }),
+    );
 
     const photoUrl = await this.uploadService.cloudinaryImage(photo);
 

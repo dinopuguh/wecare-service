@@ -6,6 +6,8 @@ import {
   UploadedFile,
   Get,
   Param,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../../models/User';
@@ -22,6 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '../../custom.decorator';
 import { ActivityToUser } from '../../models/ActivityToUser';
 import { Activity } from '../../models/Activity';
+import { UsePointDto } from './dto/use-point.dto';
 
 @Crud({
   model: {
@@ -117,5 +120,17 @@ export class UserController implements CrudController<User> {
     const activities = await user.activities.filter(a => a.isDone === false);
 
     return activities;
+  }
+
+  @Post('use-point')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  async usePoint(
+    @CurrentUser() user: User,
+    @Body() usePointDto: UsePointDto,
+  ): Promise<User> {
+    const result = await this.service.usePoint(user.id, usePointDto.amount);
+
+    return result;
   }
 }

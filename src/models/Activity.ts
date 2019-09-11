@@ -100,6 +100,9 @@ export class Activity {
   @Column('boolean', { default: false })
   isDone: boolean;
 
+  @Column('timestamp', { nullable: true })
+  doneAt: Date;
+
   @ManyToOne(type => Category, category => category.activities)
   category: Category;
 
