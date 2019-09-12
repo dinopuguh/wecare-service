@@ -304,35 +304,44 @@ export class ActivityController implements CrudController<Activity> {
       Point.LOCATION_VERIFIED,
     );
 
-    await Promise.all(
-      activity.volunteers.map(async volunteer => {
-        if (volunteer.isPresent) {
-          return this.userService.addPoint(
-            volunteer.userId,
-            volunteersPoint.point,
-          );
-        }
-      }),
-    );
+    if (activity.volunteers.length > 0) {
+      await Promise.all(
+        activity.volunteers.map(async volunteer => {
+          if (volunteer.isPresent) {
+            return this.userService.addPoint(
+              volunteer.userId,
+              volunteersPoint.point,
+            );
+          }
+        }),
+      );
+    }
 
-    await Promise.all(
-      activity.donations.map(async donation => {
-        if (donation.isVerified) {
-          return this.userService.addPoint(donation.userId, donorsPoint.point);
-        }
-      }),
-    );
+    if (activity.donations.length > 0) {
+      await Promise.all(
+        activity.donations.map(async donation => {
+          if (donation.isVerified) {
+            return this.userService.addPoint(
+              donation.userId,
+              donorsPoint.point,
+            );
+          }
+        }),
+      );
+    }
 
-    await Promise.all(
-      activity.locations.map(async location => {
-        if (location.isApproved) {
-          return this.userService.addPoint(
-            location.userId,
-            locationVerifiedPoint.point + locationsPoint.point,
-          );
-        }
-      }),
-    );
+    if (activity.locations.length > 0) {
+      await Promise.all(
+        activity.locations.map(async location => {
+          if (location.isApproved) {
+            return this.userService.addPoint(
+              location.userId,
+              locationVerifiedPoint.point + locationsPoint.point,
+            );
+          }
+        }),
+      );
+    }
 
     const photoUrl = await this.uploadService.cloudinaryImage(photo);
 
